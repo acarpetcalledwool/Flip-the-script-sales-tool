@@ -59,7 +59,7 @@
             transition: 0.3s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            pointer-events: none;
+            pointer-events: none; /* Locked by default */
         }
         .nav-pill.active {
             background: var(--card-bg);
@@ -105,32 +105,27 @@
         .card h3 { margin: 0 0 5px 0; font-size: 1rem; color: #34495e; }
         .card p { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; }
 
-        /* --- EXPERTISE --- */
-        .expert-tip { border-left: 3px solid #bdc3c7; padding-left: 10px; margin-bottom: 12px; }
-        .expert-tip i { font-style: italic; color: #7f8c8d; font-size: 0.9rem; }
-
         /* --- CHECKBOX ITEMS --- */
-        .intent-item, .checklist-item {
+        .intent-item {
             background: white; border: 1px solid #eee; border-radius: 12px;
             padding: 15px; margin-bottom: 12px; transition: 0.2s; cursor: pointer;
         }
-        .intent-item.active, .checklist-item.active { border-color: var(--safe); background: #f0fff4; }
+        .intent-item.active { border-color: var(--safe); background: #f0fff4; }
         
-        .script-options {
-            margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0;
-            font-size: 0.85rem; color: #666; font-style: italic; display: none;
+        .script-detail {
+            font-size: 0.85rem; color: #555; margin-top: 5px; line-height: 1.4;
         }
-        .show-scripts { display: block; }
+        .script-detail i { color: #004a99; font-weight: 600; }
 
         .checkbox-row { display: flex; align-items: center; justify-content: space-between; }
         .check-circle {
             width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ccc;
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .intent-item.active .check-circle, .checklist-item.active .check-circle { background: var(--safe); border-color: var(--safe); color: white; }
-        .intent-item.active .check-circle:after, .checklist-item.active .check-circle:after { content: '✓'; font-weight: bold; }
+        .intent-item.active .check-circle { background: var(--safe); border-color: var(--safe); color: white; }
+        .intent-item.active .check-circle:after { content: '✓'; font-weight: bold; }
 
-        /* --- TOGGLE --- */
+        /* YES/NO TOGGLE */
         .toggle-container { display: flex; gap: 10px; margin-top: 5px; }
         .toggle-btn {
             flex: 1; padding: 10px; border: 2px solid #eee; border-radius: 8px;
@@ -143,7 +138,14 @@
             padding: 10px; border-radius: 8px; margin-top: 10px; display: none; 
         }
 
-        /* --- BUTTONS --- */
+        /* --- PITCH UI --- */
+        .checklist-item {
+            background: #f8f9fa; border: 2px solid #eee; border-radius: 12px;
+            padding: 18px; margin-bottom: 12px; display: flex; align-items: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .checklist-item.active { background: #fff; border-color: var(--safe); box-shadow: 0 4px 15px rgba(39,174,96,0.15); }
+        
         .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .btn-full { width: 100%; margin-top: 20px; }
         .btn {
@@ -179,28 +181,20 @@
         .drum-text { margin-top: 20px; font-size: 1.5rem; color: var(--p); font-weight: 800; }
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } }
 
-        /* --- OBJECTION TILES --- */
-        .objection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .obj-btn {
-            background: white; border: 2px solid #eee; padding: 20px; border-radius: 16px;
-            text-align: center; font-weight: 700; color: #555; cursor: pointer; transition: 0.2s;
-        }
-        .obj-btn:hover { border-color: var(--p); color: var(--p); background: #f0f7ff; }
-
-        /* --- UTILS --- */
-        .calc-inp { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 1.5rem; text-align: center; box-sizing: border-box; margin-bottom:15px; font-weight:bold; color:var(--p); }
-        .calc-res { background: var(--p); color: white; border-radius: 12px; padding: 20px; text-align: center; font-weight: 800; font-size: 1.8rem; margin-top:15px; }
+        /* --- CALCULATORS --- */
+        .calc-row { display: flex; align-items: center; margin-bottom: 10px; }
+        .calc-label { width: 120px; font-size: 0.9rem; font-weight: bold; color: #555; }
+        .calc-inp { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 1.2rem; text-align: center; box-sizing: border-box; font-weight:bold; color:var(--p); }
+        .calc-res { background: var(--p); color: white; border-radius: 12px; padding: 20px; text-align: center; font-weight: 800; font-size: 1.5rem; margin-top:15px; }
+        
+        /* --- TECH SPECS UI --- */
         .search-input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; }
         .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .cat-card { background: white; padding: 20px; border-radius: 16px; text-align: center; font-weight: 700; color: #555; border: 2px solid #eee; cursor: pointer; }
         .tech-list-item { background: white; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; color: #333; }
         .spec-detail { background: white; border-radius: 12px; padding: 20px; line-height: 1.6; color: #444; }
         .redirect-box { background: #eef6ff; border-radius: 16px; padding: 20px; margin-top: 20px; border-left: 4px solid var(--p); }
-        
-        .rep-prompt {
-            color: var(--p); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;
-            background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #bbdefb;
-        }
+        .rep-prompt { color: var(--p); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #bbdefb; }
         .rep-prompt.urgent { color: #c0392b; background: #fff5f5; border-color: #ffcdd2; }
         
         .hidden { display: none !important; }
@@ -236,31 +230,75 @@
     
     <div class="card" style="border-left-color: #bdc3c7;">
         <h2>💡 Expertise Score <span id="expertScore" style="float:right; color:#ccc;">0/3</span></h2>
-        <p>Demonstrate your value. Tick off as you drop these knowledge bombs.</p>
-        <div class="intent-item" id="exp1" onclick="toggleExpert('exp1')"><div class="checkbox-row"><b>1. Aesthetics (Hide Chains)</b><div class="check-circle"></div></div></div>
-        <div class="intent-item" id="exp2" onclick="toggleExpert('exp2')"><div class="checkbox-row"><b>2. Design Match (Texture)</b><div class="check-circle"></div></div></div>
-        <div class="intent-item" id="exp3" onclick="toggleExpert('exp3')"><div class="checkbox-row"><b>3. Practicality (Clearance)</b><div class="check-circle"></div></div></div>
+        <p>Did you demonstrate value? Tick when you have said or done these specific things:</p>
+        
+        <div class="intent-item" id="exp1" onclick="toggleExpert('exp1')">
+            <div class="checkbox-row"><b>1. Aesthetics (The Fix)</b><div class="check-circle"></div></div>
+            <div class="script-detail">Did you suggest a fix they missed?<br><i>"I can reverse roll this so the tube is hidden."</i></div>
+        </div>
+
+        <div class="intent-item" id="exp2" onclick="toggleExpert('exp2')">
+            <div class="checkbox-row"><b>2. Design (The Match)</b><div class="check-circle"></div></div>
+            <div class="script-detail">Did you link it to their furniture?<br><i>"This texture connects the rug to the walls perfectly."</i></div>
+        </div>
+
+        <div class="intent-item" id="exp3" onclick="toggleExpert('exp3')">
+            <div class="checkbox-row"><b>3. Technical (The Foresight)</b><div class="check-circle"></div></div>
+            <div class="script-detail">Did you solve a future problem?<br><i>"We need 60mm clearance here for the handle."</i></div>
+        </div>
     </div>
 
     <div class="card">
         <h2>Intention Monitor <span id="scoreDisplay" style="float:right; color:#ccc;">0/5</span></h2>
-        <p>Score the client. <b>Minimum 3/5</b> required to unlock Pitch Mode.</p>
-        <div class="intent-item" id="intent1"><div class="checkbox-row" onclick="toggleIntent('intent1')"><b>1. Visual Buy-In</b><div class="check-circle"></div></div><div class="script-options show-scripts">• "Does this fabric tone work?"</div></div>
-        <div class="intent-item" id="intent2"><div class="checkbox-row" onclick="toggleIntent('intent2')"><b>2. Problem Solved</b><div class="check-circle"></div></div><div class="script-options show-scripts">• "Solves the glare issue?"</div></div>
-        <div class="intent-item" id="intent3"><div class="checkbox-row" onclick="toggleIntent('intent3')"><b>3. Technical Ownership</b><div class="check-circle"></div></div><div class="script-options show-scripts">• "Control on the left?"</div></div>
-        <div class="intent-item" id="intent4"><b>4. Partner / Decision Maker</b><div class="toggle-container"><div id="pYes" class="toggle-btn yes" onclick="setPartner(true)">Present (YES)</div><div id="pNo" class="toggle-btn no" onclick="setPartner(false)">Absent (NO)</div></div><div id="pWarn" class="partner-warning">⚠️ <b>Risk:</b> One-Legged Appointment.</div></div>
-        <div class="intent-item" id="intent5"><div class="checkbox-row" onclick="toggleIntent('intent5')"><b>5. Client is Engaged/Excited</b><div class="check-circle"></div></div></div>
+        <p>Score the client's behaviour. <b>Minimum 3/5</b> unlocks Pitch Mode.</p>
+
+        <div class="intent-item" id="intent1" onclick="toggleIntent('intent1')">
+            <div class="checkbox-row"><b>1. Visual Buy-In</b><div class="check-circle"></div></div>
+            <div class="script-detail"><b>Tell:</b> Touching fabric/nodding.<br><i>"Can you see this working with the sofa?"</i></div>
+        </div>
+
+        <div class="intent-item" id="intent2" onclick="toggleIntent('intent2')">
+            <div class="checkbox-row"><b>2. Problem Solved</b><div class="check-circle"></div></div>
+            <div class="script-detail"><b>Tell:</b> Sigh of relief regarding heat/glare.<br><i>"Imagine that glare gone tomorrow."</i></div>
+        </div>
+
+        <div class="intent-item" id="intent3" onclick="toggleIntent('intent3')">
+            <div class="checkbox-row"><b>3. Ownership</b><div class="check-circle"></div></div>
+            <div class="script-detail"><b>Tell:</b> Discussing operation/logistics.<br><i>"Shall we put the chain on the left?"</i></div>
+        </div>
+
+        <div class="intent-item" id="intent4">
+            <div style="margin-bottom:5px;"><b>4. Partner / Decision Maker</b></div>
+            <div class="toggle-container">
+                <div id="pYes" class="toggle-btn yes" onclick="setPartner(true)">Present (YES)</div>
+                <div id="pNo" class="toggle-btn no" onclick="setPartner(false)">Absent (NO)</div>
+            </div>
+            <div id="pWarn" class="partner-warning">⚠️ <b>Stop:</b> Don't pitch yet. Ask:<br><i>"Will [Partner] need to see this before we proceed?"</i></div>
+        </div>
+
+        <div class="intent-item" id="intent5" onclick="toggleIntent('intent5')">
+            <div class="checkbox-row"><b>5. Engagement</b><div class="check-circle"></div></div>
+            <div class="script-detail"><b>Tell:</b> Open body language, asking for price/timeline.</div>
+        </div>
+
         <div id="unlockMsg" style="text-align:center; color:#27ae60; font-weight:bold; display:none; margin-top:10px;">🔓 Pitch Mode Unlocked</div>
     </div>
 
     <div class="card">
-        <h2>Course Calculator</h2>
-        <input type="number" id="cInput" class="calc-inp" placeholder="Enter Courses">
+        <h2>Plan Decoder</h2>
+        <div class="calc-row">
+            <span class="calc-label">Height (Courses)</span>
+            <input type="number" id="hInput" class="calc-inp" placeholder="0">
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">Width (Bricks)</span>
+            <input type="number" id="wInput" class="calc-inp" placeholder="0">
+        </div>
         <div class="btn-grid">
             <button class="btn btn-outline" onclick="resetCalc()">Reset</button>
             <button class="btn btn-primary" onclick="runCalc()" style="animation:none;">Calculate</button>
         </div>
-        <div id="cResult" class="calc-res">0 mm</div>
+        <div id="cResult" class="calc-res">0 mm x 0 mm</div>
     </div>
 </div>
 
@@ -269,9 +307,9 @@
     <div id="step_value" class="card">
         <h2>1. Package Verification</h2>
         <p>Before we view the investment, let's confirm this solves the problem.</p>
-        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Design & Happiness</b></div></div>
-        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Lead Time Suitability</b></div></div>
-        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Scope & Inclusions</b></div></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Design & Happiness</b><br><span style="font-size:0.85rem; color:#666;">Excited about the fabric/look?</span></div></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Lead Time Suitability</b><br><span style="font-size:0.85rem; color:#666;">Timeline works for the project?</span></div></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Scope Accuracy</b><br><span style="font-size:0.85rem; color:#666;">All windows covered correctly?</span></div></div>
         <button id="revealBtn" class="btn btn-primary btn-full hidden" onclick="playDrumroll()">Everything Correct. Reveal Investment.</button>
     </div>
 
@@ -284,7 +322,7 @@
         </div>
         <div class="btn-grid">
             <button class="btn btn-safe" onclick="nextStep('step_win')">Happy / Let's Go</button>
-            <button class="btn btn-danger" onclick="nextStep('step_crossroads')">Too Expensive</button>
+            <button class="btn btn-danger" onclick="nextStep('step_discount5')">Too Expensive</button>
         </div>
         <div class="btn-full" style="margin-top:15px;"><button class="btn btn-outline" onclick="nextStep('step_crossroads')">Something Else...</button></div>
     </div>
@@ -293,83 +331,77 @@
         <h2>3. Project Review</h2>
         <p>What is holding us back?</p>
         <div class="objection-grid">
-            <div class="obj-btn" onclick="nextStep('maze_price')">💰 Budget / Value</div>
             <div class="obj-btn" onclick="nextStep('maze_partner')">👫 Partner / Spouse</div>
             <div class="obj-btn" onclick="nextStep('maze_shop')">🔍 Product Match</div>
             <div class="obj-btn" onclick="nextStep('maze_time')">⏳ Timing</div>
         </div>
     </div>
 
-    <div id="maze_price" class="card hidden">
-        <h2 style="color:var(--danger);">Budget Calibration</h2>
-        <p>How do we bridge the gap?</p>
-        
+    <div id="step_discount5" class="card hidden">
+        <h2 style="color:var(--p);">Strategic Adjustment</h2>
+        <div class="rep-prompt">📢 REP: Offer 5% Discount to seal it now.</div>
+        <div class="redirect-box"><span class="redirect-title">Proposal</span><p style="margin:0;">"I can authorize a <b>5% Manager's Discount</b> right now if we secure the production slot today."</p></div>
+        <div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Client Accepted (Sign)</button><button class="btn btn-danger" onclick="nextStep('step_align')">Still Too High</button></div>
+    </div>
+
+    <div id="step_align" class="card hidden">
+        <h2 style="color:var(--p);">Quality Defense</h2>
+        <div class="rep-prompt urgent">📢 REP: Do not drop quality yet. Align with Client.</div>
+        <div class="redirect-box"><p style="margin:0;">"I mean, I think we <i>could</i> get the price down... but we would have to <b>sacrifice the quality</b> or lose that specific fabric you loved. I really don't want to do that."</p></div>
+        <div class="btn-grid"><button class="btn btn-primary" onclick="nextStep('step_manager')">Team Up & Call Manager</button><button class="btn btn-danger" onclick="nextStep('maze_descope')">I don't care. Descope it.</button></div>
+    </div>
+
+    <div id="step_manager" class="card hidden">
+        <h2 style="color:var(--safe);">The Manager Gambit</h2>
+        <div class="rep-prompt">📢 REP: Put phone on Speaker. Fight for the Client.</div>
+        <div class="redirect-box"><span class="redirect-title">The Proposition</span><p style="margin:0;">"If I call my boss right now and fight for a <b>'Today Only' special price</b> to keep the specs exactly as they are... will you order it with me today?"</p></div>
+        <div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_discount_win')">Manager Approved (10%)</button><button class="btn btn-danger" onclick="nextStep('step_manager_loud')">Manager Said No (Descope)</button></div>
+    </div>
+
+    <div id="step_manager_loud" class="card hidden">
+        <h2 style="color:var(--danger);">Engage Support</h2>
+        <div class="redirect-box" style="background:#fff5f5; border-color:var(--danger);">
+            <div class="rep-prompt urgent" style="margin-bottom:10px;">⚠️ ASK LOUDLY (For Manager to hear)</div>
+            <p style="font-size:1.2rem; font-weight:bold; color:#333;">"Well, did you perhaps have a budget in mind?"</p>
+        </div>
+        <div class="btn-grid">
+            <button class="btn btn-safe" onclick="nextStep('step_discount_win')">They gave a number (Deal)</button>
+            <button class="btn btn-danger" onclick="nextStep('maze_descope')">Still Stalled (Descope)</button>
+        </div>
+    </div>
+
+    <div id="maze_descope" class="card hidden">
+        <h2 style="color:var(--danger);">Reduce Quality</h2>
+        <p>To go lower, we MUST remove features.</p>
         <div id="descopeList">
             <div class="checklist-item active" onclick="toggleStrike(this)"><div class="check-circle"></div><div><b>1. Step Down Fabric Group</b></div></div>
             <div class="checklist-item active" onclick="toggleStrike(this)"><div class="check-circle"></div><div><b>2. Change Motors to Manual</b></div></div>
             <div class="checklist-item active" onclick="toggleStrike(this)"><div class="check-circle"></div><div><b>3. Remove Specific Windows</b></div></div>
         </div>
-
-        <button class="btn btn-primary btn-full" onclick="nextStep('step_manager_gambit')">
-            "Can we just make it cheaper?" <br><span style="font-size:0.8rem; font-weight:normal;">(Manager Call)</span>
-        </button>
+        <div class="btn-grid"><button class="btn btn-danger" onclick="doDescope()">Reduce Quality</button><button class="btn btn-primary" onclick="nextStep('step_manager_gambit')">"Make it Cheaper?" (Call)</button></div>
+        <span class="exit-link" onclick="nextStep('step_exit')">The budget is strictly fixed. (Archive Quote)</span>
     </div>
 
-    <div id="step_manager_gambit" class="card hidden">
-        <h2 style="color:var(--safe);">The Negotiation</h2>
-        
-        <div class="redirect-box">
-            <span class="redirect-title">1. The Tie Down</span>
-            <p>"If I call my boss right now and fight for a <b>'Today Only' special price</b> to keep the specs exactly as they are... will you order it with me today?"</p>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="nextStep('step_manager_call')">They Agreed. Call Manager.</button>
-    </div>
-
-    <div id="step_manager_call" class="card hidden">
-        <h2 style="color:var(--warn);">The Call</h2>
-        <div class="rep-prompt">📢 REP: Manager is on Speaker. Price given. Watch Client's Face.</div>
-        
-        <div class="btn-grid">
-            <button class="btn btn-safe" onclick="nextStep('step_discount_win')">Client is Happy (Win)</button>
-            <button class="btn btn-danger" onclick="showLoudQuestion()">Client looks uncertain</button>
-        </div>
-
-        <div id="loudQuestion" class="redirect-box hidden" style="border-color:var(--danger); background:#fff5f5;">
-            <div class="rep-prompt urgent" style="margin-bottom:10px;">⚠️ ENGAGE SUPPORT</div>
-            <span class="redirect-title">Ask LOUDLY (So Manager hears):</span>
-            <p style="font-size:1.2rem; font-weight:bold; color:#333;">"Well, did you perhaps have a budget in mind?"</p>
-        </div>
-    </div>
-
-    <div id="maze_partner" class="card hidden">
-        <h2 style="color:var(--warn);">Joint Decision</h2>
-        <div class="redirect-box">
-            <p><b>Question:</b> "If they were here and said YES, would you sign right now?"</p>
-            <ul><li><b>YES:</b> Then let's FaceTime them.</li><li><b>NO:</b> Then the partner isn't the issue.</li></ul>
-        </div>
-        <div class="btn-grid"><button class="btn btn-primary" onclick="nextStep('step_win')">Call & Sign</button><button class="btn btn-outline" onclick="nextStep('step_crossroads')">It's not the Partner</button></div>
-        <span class="exit-link" onclick="nextStep('step_exit')">Absolute Veto. (Archive Quote)</span>
-    </div>
-
-    <div id="maze_shop" class="card hidden">
-        <h2 style="color:var(--p);">Product Match</h2>
-        <div class="redirect-box"><p>Check these 3 things:</p><ul><li>Reinforced Core?</li><li>Acmeda Hardware?</li><li>10 Year Warranty?</li></ul></div>
-        <div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Stick with Quality</button><button class="btn btn-outline" onclick="nextStep('step_crossroads')">Review Budget</button></div>
-    </div>
-
-    <div id="maze_time" class="card hidden">
-        <h2 style="color:var(--warn);">Schedule Risk</h2>
-        <div class="redirect-box"><span class="redirect-title">Production Reality</span><p>Lead Time: <b>8 Weeks</b>. Order today = Install [Date]. Delay = Risk.</p></div>
-        <div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Secure Slot</button><button class="btn btn-outline" onclick="nextStep('step_exit')">Risk Delay</button></div>
-    </div>
+    <div id="maze_partner" class="card hidden"><h2 style="color:var(--warn);">Joint Decision</h2><div class="redirect-box"><p><b>Question:</b> "If they were here and said YES, would you sign right now?"</p></div><div class="btn-grid"><button class="btn btn-primary" onclick="nextStep('step_win')">Call & Sign</button><button class="btn btn-outline" onclick="nextStep('step_crossroads')">It's not the Partner</button></div><span class="exit-link" onclick="nextStep('step_exit')">Absolute Veto.</span></div>
+    <div id="maze_shop" class="card hidden"><h2 style="color:var(--p);">Product Match</h2><div class="redirect-box"><p>Check these 3 things:</p><ul><li>Reinforced Core?</li><li>Acmeda Hardware?</li><li>10 Year Warranty?</li></ul></div><div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Stick with Quality</button><button class="btn btn-outline" onclick="nextStep('step_crossroads')">Review Budget Instead</button></div><span class="exit-link" onclick="nextStep('step_exit')">Don't have what I want.</span></div>
+    <div id="maze_time" class="card hidden"><h2 style="color:var(--warn);">Schedule Risk</h2><div class="redirect-box"><span class="redirect-title">Production Reality</span><p>Lead Time: <b>8 Weeks</b>. Order today = Install [Date]. Delay = Risk.</p></div><div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Secure Slot</button><button class="btn btn-outline" onclick="nextStep('step_exit')">Risk Delay</button></div></div>
 
     <div id="step_win" class="card hidden" style="text-align:center; border-left-color:var(--safe);"><h1 style="font-size:4rem;">🎉</h1><h2>Green Light</h2><button class="btn btn-outline" onclick="openReset()">Start New Project</button></div>
     <div id="step_discount_win" class="card hidden" style="text-align:center; border-left-color:var(--safe);"><h1 style="font-size:4rem;">🤝</h1><h2>Manager Approved</h2><p>10% Discount Applied.</p><button class="btn btn-outline" onclick="openReset()">Start New Project</button></div>
     <div id="step_exit" class="card hidden" style="text-align:center; border-left-color: #95a5a6;"><h1 style="font-size:4rem; filter:grayscale(1);">📂</h1><h2>Project Archived</h2><button class="btn btn-outline" onclick="openReset()">Close Session</button></div>
-
 </div>
 
 <div id="specs" class="content">
+    
+    <div class="card" style="background:#f9f9f9; border-left-color:#333;">
+        <h3>Shutter Ballpark Calculator</h3>
+        <div class="calc-row"><span class="calc-label">Width (mm)</span><input type="number" id="sW" class="calc-inp"></div>
+        <div class="calc-row"><span class="calc-label">Height (mm)</span><input type="number" id="sH" class="calc-inp"></div>
+        <div class="calc-row"><span class="calc-label">Rate ($/sqm)</span><input type="number" id="sR" class="calc-inp" value="400"></div>
+        <button class="btn btn-primary" onclick="runShutterCalc()" style="width:100%; margin-top:10px; animation:none;">Estimate Cost</button>
+        <div id="sRes" class="calc-res" style="background:#333;">$0.00 (0 sqm)</div>
+    </div>
+
     <input type="text" id="tSearch" class="search-input" placeholder="Search (e.g. 'remote', 'gap')..." onkeyup="filterTech()">
     <div id="bread" class="breadcrumb hidden"><span onclick="renderCategories()">Categories</span> > <span id="breadCat"></span></div>
     <div id="catGrid" class="cat-grid"></div>
@@ -378,7 +410,7 @@
 </div>
 
 <script>
-    /* --- DATA & SEARCH --- */
+    /* --- DATA --- */
     const techData = {
         "Roller Blinds": [
             {name:"Hardware (Acmeda)", keys:"chain tube rb09", desc:"Standard RB09 Hardware", details:"Chain: RB09 Smooth.\nTube: 45mm HD.\nLight Gaps: 14mm/10mm."},
@@ -396,13 +428,10 @@
         ]
     };
 
+    /* --- TECH LOGIC --- */
     function renderCategories() {
         const grid = document.getElementById('catGrid'); grid.innerHTML = "";
-        document.getElementById('bread').classList.add('hidden');
-        document.getElementById('prodList').classList.add('hidden');
-        document.getElementById('detailView').classList.add('hidden');
-        document.getElementById('catGrid').classList.remove('hidden');
-        document.getElementById('tSearch').value = "";
+        document.getElementById('bread').classList.add('hidden'); document.getElementById('prodList').classList.add('hidden'); document.getElementById('detailView').classList.add('hidden'); document.getElementById('catGrid').classList.remove('hidden');
         Object.keys(techData).forEach(cat => { grid.innerHTML += `<div class="cat-card" onclick="renderProducts('${cat}')">${cat}</div>`; });
     }
     function renderProducts(cat) {
@@ -431,25 +460,36 @@
         });
     }
 
-    /* --- SCORING --- */
+    /* --- CALCULATORS --- */
+    function runCalc() {
+        const h = document.getElementById('hInput').value;
+        const w = document.getElementById('wInput').value;
+        const hMm = h ? Math.round(h * 89) : 0;
+        const wMm = w ? Math.round(w * 240) : 0;
+        document.getElementById('cResult').innerText = `H: ${hMm}mm | W: ${wMm}mm`;
+    }
+    function resetCalc() {
+        document.getElementById('hInput').value = ''; document.getElementById('wInput').value = '';
+        document.getElementById('cResult').innerText = '0 mm x 0 mm';
+    }
+    function runShutterCalc() {
+        const w = document.getElementById('sW').value;
+        const h = document.getElementById('sH').value;
+        const r = document.getElementById('sR').value;
+        if(w && h && r) {
+            const sqm = (w/1000) * (h/1000);
+            const total = sqm * r;
+            document.getElementById('sRes').innerText = `$${total.toFixed(2)} (${sqm.toFixed(2)} sqm)`;
+        }
+    }
+
+    /* --- SCORING & LOGIC --- */
     let scoreObj = {intent1:0, intent2:0, intent3:0, intent4:0, intent5:0}, currentScore=0;
     let expertObj = {exp1:0, exp2:0, exp3:0}, expertScore=0;
 
-    function toggleExpert(id) {
-        const el = document.getElementById(id); el.classList.toggle('active');
-        expertObj[id] = el.classList.contains('active') ? 1 : 0;
-        document.getElementById('expertScore').innerText = Object.values(expertObj).reduce((a,b)=>a+b,0) + "/3";
-    }
-    function toggleIntent(id) {
-        const el = document.getElementById(id); el.classList.toggle('active');
-        scoreObj[id] = el.classList.contains('active') ? 1 : 0; updateScore();
-    }
-    function setPartner(isYes) {
-        document.getElementById('pYes').classList.toggle('selected', isYes);
-        document.getElementById('pNo').classList.toggle('selected', !isYes);
-        scoreObj.intent4 = isYes ? 1 : 0;
-        document.getElementById('pWarn').style.display = isYes ? 'none' : 'block'; updateScore();
-    }
+    function toggleExpert(id) { const el = document.getElementById(id); el.classList.toggle('active'); expertObj[id] = el.classList.contains('active') ? 1 : 0; document.getElementById('expertScore').innerText = Object.values(expertObj).reduce((a,b)=>a+b,0) + "/3"; }
+    function toggleIntent(id) { const el = document.getElementById(id); el.classList.toggle('active'); scoreObj[id] = el.classList.contains('active') ? 1 : 0; updateScore(); }
+    function setPartner(isYes) { document.getElementById('pYes').classList.toggle('selected', isYes); document.getElementById('pNo').classList.toggle('selected', !isYes); scoreObj.intent4 = isYes ? 1 : 0; document.getElementById('pWarn').style.display = isYes ? 'none' : 'block'; updateScore(); }
     function updateScore() {
         currentScore = Object.values(scoreObj).reduce((a,b)=>a+b,0);
         document.getElementById('scoreDisplay').innerText = currentScore + "/5";
@@ -469,7 +509,8 @@
     function openReset() { document.getElementById('resetModal').style.display = 'flex'; }
     function closeReset() { document.getElementById('resetModal').style.display = 'none'; }
     function resetPage() {
-        document.querySelectorAll('input').forEach(el => el.value = ''); document.getElementById('cResult').innerText = '0 mm';
+        document.querySelectorAll('input').forEach(el => el.value = ''); 
+        document.getElementById('cResult').innerText = '0 mm'; document.getElementById('sRes').innerText = '$0.00';
         if(document.getElementById('pitch').classList.contains('active')) {
              document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden')); document.getElementById('step_value').classList.remove('hidden');
              checkCount = 0; document.querySelectorAll('#pitch .checklist-item').forEach(el => el.classList.remove('active')); document.getElementById('revealBtn').classList.add('hidden');
@@ -478,28 +519,17 @@
     }
     function resetJob() { if(confirm("Back to Staff Only?")) location.reload(); }
 
-    /* --- PITCH LOGIC --- */
+    /* --- PITCH FLOW --- */
     let checkCount = 0;
-    function toggleCheck(el) {
-        el.classList.toggle('active'); checkCount += el.classList.contains('active') ? 1 : -1;
-        document.getElementById('revealBtn').classList.toggle('hidden', checkCount < 3);
-    }
-    function toggleStrike(el) {
-        if(el.classList.contains('active')) { el.classList.remove('active'); el.classList.add('struck'); }
-        else { el.classList.add('active'); el.classList.remove('struck'); }
-    }
-    function playDrumroll() {
-        document.getElementById('drumrollOverlay').style.display = 'flex';
-        setTimeout(() => { document.getElementById('drumrollOverlay').style.display = 'none'; nextStep('step_reveal'); }, 2000);
-    }
-    function nextStep(id) {
-        document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden');
-    }
+    function toggleCheck(el) { el.classList.toggle('active'); checkCount += el.classList.contains('active') ? 1 : -1; document.getElementById('revealBtn').classList.toggle('hidden', checkCount < 3); }
+    function toggleStrike(el) { if(el.classList.contains('active')) { el.classList.remove('active'); el.classList.add('struck'); } else { el.classList.add('active'); el.classList.remove('struck'); } }
+    function playDrumroll() { document.getElementById('drumrollOverlay').style.display = 'flex'; setTimeout(() => { document.getElementById('drumrollOverlay').style.display = 'none'; nextStep('step_reveal'); }, 2000); }
+    function nextStep(id) { document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
     function showLoudQuestion() { document.getElementById('loudQuestion').classList.remove('hidden'); }
-
-    /* --- CALC --- */
-    function runCalc() { const c = document.getElementById('cInput').value; document.getElementById('cResult').innerText = (c ? Math.round(c*89) : 0) + " mm"; }
-    function resetCalc() { document.getElementById('cInput').value = ''; document.getElementById('cResult').innerText = '0 mm'; }
+    function doDescope() {
+        const items = document.querySelectorAll('#descopeList .checklist-item');
+        items.forEach(el => { el.classList.remove('active'); el.classList.add('struck'); });
+    }
 
     renderCategories();
 </script>
