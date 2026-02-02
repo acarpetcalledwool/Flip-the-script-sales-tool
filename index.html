@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Blinds Companion</title>
+    <title>Mega Blinds Sales Maze</title>
     <style>
         :root { 
             --p: #004a99; /* Mega Blue */
-            --bg: #f8f9fa; 
-            --txt: #212529; 
-            --err: #d90429; 
-            --safe: #28a745;
-            --warn: #ffc107;
+            --bg: #f0f2f5; 
             --card-bg: #ffffff;
+            --txt: #1a1a1a;
+            --safe: #27ae60;
+            --warn: #f39c12;
+            --danger: #c0392b;
+            --subtle: #95a5a6;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -23,483 +24,514 @@
             display: flex; 
             flex-direction: column; 
             height: 100vh;
-            overflow: hidden;
+            overflow: hidden; 
         }
 
         /* --- HEADER --- */
         .header {
             background: var(--card-bg);
-            padding: 10px 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            z-index: 100;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            z-index: 100;
+            position: relative;
         }
         .nav-pill-container {
             display: flex;
-            background: #e9ecef;
-            border-radius: 20px;
-            padding: 4px;
+            background: #ecf0f1;
+            border-radius: 50px;
+            padding: 5px;
             width: 100%;
-            max-width: 500px;
+            max-width: 650px;
+            transition: all 0.3s ease;
         }
         .nav-pill {
             flex: 1;
             text-align: center;
-            padding: 10px 5px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #6c757d;
-            border-radius: 16px;
+            padding: 14px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #bdc3c7;
+            border-radius: 40px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .nav-pill.active {
             background: var(--card-bg);
             color: var(--p);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+        .nav-pill.vanished {
+            flex: 0; padding: 0; margin: 0; opacity: 0; width: 0; pointer-events: none;
+        }
+        .stealth-btn {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            font-size: 1.2rem; color: #bdc3c7; opacity: 0.2; cursor: pointer; transition: 0.2s;
+        }
+        .stealth-btn:hover { opacity: 1; color: var(--danger); }
 
         /* --- CONTENT --- */
         .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            box-sizing: border-box;
-            display: none;
+            flex: 1; overflow-y: auto; padding: 25px;
+            max-width: 750px; margin: 0 auto; width: 100%;
+            display: none; box-sizing: border-box;
         }
-        .content.active { display: block; animation: fadeIn 0.3s ease; }
+        .content.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- CARDS & UI --- */
+        /* --- CARDS --- */
         .card {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            margin-bottom: 20px;
-            border-top: 5px solid var(--p);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            border-left: 8px solid var(--p);
         }
-        .card h3 { margin-top: 0; color: var(--p); font-size: 1.1rem; }
-        .card p { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
+        .card h2 { margin-top: 0; color: var(--p); font-size: 1.6rem; letter-spacing: -0.5px; }
+        .card p { color: #555; line-height: 1.6; margin-bottom: 25px; font-size: 1.05rem; }
 
-        /* --- PROMPT BOX --- */
-        .prompt-box {
-            background: #eef4fc;
-            border-left: 4px solid var(--p);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .prompt-label {
-            display: block;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: var(--p);
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-        .prompt-text {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        /* --- BUTTONS --- */
-        .btn-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .btn {
-            background: #fff;
-            border: 2px solid #e9ecef;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #495057;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .btn:active { transform: scale(0.98); background: #f8f9fa; }
-        .btn-sub { display: block; font-size: 0.8rem; color: #999; font-weight: normal; margin-top: 4px; }
-        
-        .btn.primary { border-color: var(--p); color: var(--p); background: #f0f7ff; }
-        .btn.danger { border-color: var(--err); color: var(--err); background: #fff5f5; }
-        .btn.safe { border-color: var(--safe); color: var(--safe); background: #f0fff4; }
-
-        /* --- CHECKLIST (YES LADDER) --- */
+        /* --- UI ELEMENTS --- */
         .checklist-item {
-            display: flex;
-            align-items: flex-start;
-            background: #fff;
-            border: 1px solid #eee;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: 0.2s;
+            background: #f8f9fa; border: 2px solid #eee; border-radius: 12px;
+            padding: 16px; margin-bottom: 12px; display: flex; align-items: center;
+            cursor: pointer; transition: 0.2s;
         }
-        .checklist-item.checked {
-            background: #f0fff4;
-            border-color: var(--safe);
-        }
+        .checklist-item.active { background: #fff; border-color: var(--safe); box-shadow: 0 4px 15px rgba(39,174,96,0.15); }
         .check-circle {
-            width: 20px; height: 20px; border-radius: 50%;
-            border: 2px solid #ccc; margin-right: 12px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            margin-top: 2px;
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ccc;
+            margin-right: 15px; display: flex; align-items: center; justify-content: center;
         }
-        .checklist-item.checked .check-circle {
-            border-color: var(--safe); background: var(--safe); color: white;
+        .checklist-item.active .check-circle { background: var(--safe); border-color: var(--safe); color: white; }
+        .checklist-item.active .check-circle:after { content: '✓'; font-weight: bold; }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .btn-full { width: 100%; margin-top: 20px; }
+        .btn {
+            padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.05rem;
+            cursor: pointer; transition: 0.2s; text-align: center;
         }
-        .check-circle:after { content: '✓'; font-size: 0.8rem; display: none; }
-        .checklist-item.checked .check-circle:after { display: block; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--p); color: white; box-shadow: 0 4px 15px rgba(0,74,153,0.3); }
+        .btn-safe { background: var(--safe); color: white; box-shadow: 0 4px 15px rgba(39,174,96,0.3); }
+        .btn-danger { background: #fff5f5; color: var(--danger); border: 2px solid #ffcdd2; }
+        .btn-outline { background: white; border: 2px solid #eee; color: #7f8c8d; }
+
+        .exit-link {
+            display: block; text-align: center; margin-top: 20px; color: #95a5a6; 
+            font-size: 0.9rem; text-decoration: underline; cursor: pointer;
+        }
+
+        /* --- OBJECTION TILES --- */
+        .objection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .obj-btn {
+            background: white; border: 2px solid #eee; padding: 20px; border-radius: 16px;
+            text-align: center; font-weight: 700; color: #555; cursor: pointer; transition: 0.2s;
+        }
+        .obj-btn:hover { border-color: var(--p); color: var(--p); background: #f0f7ff; }
+
+        /* --- INFO REDIRECT BOX --- */
+        .redirect-box {
+            background: #eef6ff; border-radius: 16px; padding: 20px; margin-top: 20px;
+            border-left: 4px solid var(--p); animation: fadeIn 0.3s ease;
+        }
+        .redirect-title { font-size: 0.8rem; text-transform: uppercase; color: var(--p); font-weight: 800; display: block; margin-bottom: 8px; }
+        .rep-prompt {
+            color: var(--p); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;
+            background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #bbdefb;
+        }
+        .rep-prompt.urgent {
+             color: #c0392b; background: #fff5f5; border-color: #ffcdd2;
+        }
+
+        /* --- POCKET MODE --- */
+        .cue-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 18px; margin-bottom: 12px; cursor: pointer; }
+        .cue-card.active { border-color: var(--safe); background: #f0fff4; }
         
-        .cue-title { font-weight: 800; font-size: 0.85rem; color: #333; display: block; margin-bottom: 2px; }
-        .cue-desc { font-size: 0.9rem; color: #666; font-style: italic; }
+        /* --- SIMPLIFIED CALCULATOR --- */
+        .calc-inp { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 1.5rem; text-align: center; box-sizing: border-box; margin-bottom:15px; font-weight:bold; color:var(--p); }
+        .calc-res { background: var(--p); color: white; border-radius: 12px; padding: 20px; text-align: center; font-weight: 800; font-size: 1.8rem; margin-top:15px; }
 
-        /* --- CALCULATOR --- */
-        .calc-row {
-            display: flex;
-            align-items: center;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 5px;
-            margin-bottom: 10px;
-        }
-        .calc-label-side {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            font-size: 0.65rem;
-            color: #adb5bd;
-            padding: 0 6px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-        .calc-input {
-            flex: 1; border: none; background: transparent;
-            font-size: 1.2rem; font-weight: 700; color: var(--p);
-            padding: 10px; outline: none; text-align: center; width: 50px;
-        }
-        .calc-select {
-            border: none; background: #e9ecef; border-radius: 8px;
-            padding: 8px 12px; font-size: 0.8rem; color: #495057; font-weight: 600; outline: none;
-        }
-        .calc-result-box {
-            background: var(--p); color: white; padding: 15px;
-            border-radius: 12px; text-align: center; margin-top: 15px;
-        }
-        .calc-final { font-size: 1.6rem; font-weight: 800; font-family: monospace; letter-spacing: 1px; }
+        /* --- TECH SEARCH --- */
+        .search-input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; }
+        .acc-item { background: white; border-radius: 12px; margin-bottom: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .acc-head { font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; }
+        .acc-body { display: none; margin-top: 10px; color: #555; line-height: 1.5; padding-top: 10px; border-top: 1px solid #eee; }
 
-        /* --- SEARCH & ACCORDION --- */
-        .search-bar {
-            width: 100%; padding: 15px; border: 2px solid #e9ecef;
-            border-radius: 12px; font-size: 1rem; box-sizing: border-box;
-            margin-bottom: 20px; outline: none; transition: 0.3s;
-        }
-        .search-bar:focus { border-color: var(--p); }
-        .accordion-item { border-bottom: 1px solid #eee; }
-        .accordion-header {
-            padding: 15px 0; cursor: pointer; display: flex;
-            justify-content: space-between; align-items: center;
-            font-weight: 600; color: #333;
-        }
-        .accordion-body { display: none; padding-bottom: 15px; font-size: 0.95rem; color: #555; line-height: 1.6; }
-        .brand-tag {
-            display: inline-block; background: #333; color: #fff;
-            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-bottom: 8px;
-        }
         .hidden { display: none !important; }
+        .struck { text-decoration: line-through; color: #bdc3c7; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="nav-pill-container">
-            <div class="nav-pill active" onclick="switchTab('pocket', this)">Pocket Mode</div>
-            <div class="nav-pill" onclick="switchTab('pitch', this)">The Pitch</div>
-            <div class="nav-pill" onclick="switchTab('specs', this)">Tech Data</div>
+<div class="header">
+    <div class="nav-pill-container">
+        <div id="nav-pocket" class="nav-pill active" onclick="switchTab('pocket')">Pocket Mode</div>
+        <div id="nav-pitch" class="nav-pill" onclick="switchTab('pitch')">Shared Table</div>
+        <div id="nav-specs" class="nav-pill" onclick="switchTab('specs')">Tech Data</div>
+    </div>
+    <div class="stealth-btn" onclick="emergencyEvac()" title="Reset Session">↻</div>
+</div>
+
+<div id="pocket" class="content active">
+    
+    <div class="card">
+        <h2>Intention Monitor</h2>
+        <p>Drop these cues while measuring. Agreement = Buying Signal.</p>
+        <div class="cue-card" onclick="this.classList.toggle('active')">
+            <b>1. The Visual Link</b>
+            <div style="font-size:0.9rem; color:#666; margin-top:5px;">"This tone pulls nicely from the sofa..."</div>
+        </div>
+        <div class="cue-card" onclick="this.classList.toggle('active')">
+            <b>2. The Problem Solver</b>
+            <div style="font-size:0.9rem; color:#666; margin-top:5px;">"That glare won't be an issue anymore..."</div>
+        </div>
+        <div class="cue-card" onclick="this.classList.toggle('active')">
+            <b>3. The Ownership</b>
+            <div style="font-size:0.9rem; color:#666; margin-top:5px;">"I'll put the winder on the left so it's hidden..."</div>
         </div>
     </div>
 
-    <div id="pocket" class="content active">
+    <div class="card">
+        <h2>Course Calculator</h2>
+        <p>Quick convert: Brick Courses to mm.</p>
         
-        <div class="card">
-            <h3>Intention Tracker</h3>
-            <p>Use these "Assumptive Cues" while measuring to test if they are mentally buying. If they push back, they aren't sold yet.</p>
-            
-            <div class="checklist-item" onclick="toggleCheck(this)">
-                <div class="check-circle"></div>
-                <div>
-                    <span class="cue-title">CUE 1: The Visual Link</span>
-                    <span class="cue-desc">"This fabric tone pulls nicely from the [Sofa/Rug]..."</span>
-                </div>
-            </div>
-            
-            <div class="checklist-item" onclick="toggleCheck(this)">
-                <div class="check-circle"></div>
-                <div>
-                    <span class="cue-title">CUE 2: The Problem Solver</span>
-                    <span class="cue-desc">"Once these are in, that [Glare/Heat] won't be an issue anymore..."</span>
-                </div>
-            </div>
-            
-            <div class="checklist-item" onclick="toggleCheck(this)">
-                <div class="check-circle"></div>
-                <div>
-                    <span class="cue-title">CUE 3: The Configuration</span>
-                    <span class="cue-desc">"I'll note this as a [Left/Right] control so it hides behind the curtain..."</span>
-                </div>
-            </div>
-            
-            <div style="margin-top:15px; font-size:0.8rem; color:#666; border-top:1px solid #eee; padding-top:10px;">
-                <b>The Test:</b> A "Yes" means they are visualizing the finish. A "Maybe" means they are still deciding.
-            </div>
+        <input type="number" id="cInput" class="calc-inp" placeholder="Enter Courses (e.g. 12)">
+        
+        <div class="btn-grid">
+            <button class="btn btn-outline" onclick="resetCalc()">Reset</button>
+            <button class="btn btn-primary" onclick="runCalc()">Calculate</button>
         </div>
 
-        <div class="card">
-            <h3>Plan Decoder</h3>
-            <div class="calc-row">
-                <div class="calc-label-side">Width</div>
-                <input type="number" id="wInput" class="calc-input" placeholder="0" oninput="calcDims()">
-                <select id="wUnit" class="calc-select" onchange="calcDims()">
-                    <option value="mm">mm</option>
-                    <option value="c">Courses</option>
-                </select>
-            </div>
-            <div class="calc-row">
-                <div class="calc-label-side">Drop</div>
-                <input type="number" id="hInput" class="calc-input" placeholder="0" oninput="calcDims()">
-                <select id="hUnit" class="calc-select" onchange="calcDims()">
-                    <option value="c">Courses</option>
-                    <option value="mm">mm</option>
-                </select>
-            </div>
-            <div class="calc-result-box">
-                <div style="font-size:0.7rem; opacity:0.8; text-transform:uppercase;">Mfg Dimensions (mm)</div>
-                <div id="finalDim" class="calc-final">- x -</div>
-            </div>
+        <div id="cResult" class="calc-res">0 mm</div>
+    </div>
+</div>
+
+<div id="pitch" class="content">
+
+    <div id="step_value" class="card">
+        <h2>1. Package Verification</h2>
+        <p>Confirm the <b>Tailored Specification</b> before we proceed.</p>
+        
+        <div class="checklist-item" onclick="toggleCheck(this)">
+            <div class="check-circle"></div>
+            <div><b>Lumiere Core</b> (Reinforced)</div>
+        </div>
+        <div class="checklist-item" onclick="toggleCheck(this)">
+            <div class="check-circle"></div>
+            <div><b>Acmeda Hardware</b> (Smooth Op)</div>
+        </div>
+        <div class="checklist-item" onclick="toggleCheck(this)">
+            <div class="check-circle"></div>
+            <div><b>Custom Finish</b> (Colour Matched)</div>
+        </div>
+
+        <button id="revealBtn" class="btn btn-primary btn-full hidden" onclick="nextStep('step_reveal')">
+            Package Confirmed. Reveal Price.
+        </button>
+    </div>
+
+    <div id="step_reveal" class="card hidden">
+        <h2>2. Investment Overview</h2>
+        
+        <div class="rep-prompt">📢 REP: Present RETAIL Price to Customer</div>
+
+        <div style="background:#f4f9ff; padding:30px; border-radius:16px; text-align:center; margin-bottom:20px; border:2px solid var(--p);">
+            <div style="font-size:0.9rem; text-transform:uppercase; color:var(--p); font-weight:800; margin-bottom:10px;">Total Project Investment</div>
+            <div style="font-size:1.5rem; font-weight:700; color:#2c3e50;">[ STATE PRICE ]</div>
+        </div>
+
+        <div class="btn-full">
+            <button class="btn btn-safe" style="width:100%; font-size:1.2rem; padding:20px;" onclick="nextStep('step_win')">Proceed to Paperwork</button>
+        </div>
+        
+        <div style="text-align:center; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+            <p style="margin-bottom:10px; font-size:0.9rem;">Need to adjust details?</p>
+            <button class="btn btn-outline" style="width:100%;" onclick="nextStep('step_crossroads')">Review Project & Budget</button>
         </div>
     </div>
 
-    <div id="pitch" class="content">
+    <div id="step_crossroads" class="card hidden">
+        <h2>3. Project Review</h2>
+        <p>Which factor is preventing us from moving forward?</p>
         
-        <div id="stage0" class="card">
-            <h3>Step 1: The Value Stack</h3>
-            <p>Confirm the <b>Tailored Package</b> before price. Make them say YES to the quality.</p>
-            
-            <div class="checklist-item" id="stack1" onclick="toggleStack(this)">
-                <div class="check-circle"></div>
-                <div>
-                    <span class="cue-title">The Durability</span>
-                    <span class="cue-desc">"We chose the Lumiere Core so it won't warp, right?"</span>
-                </div>
-            </div>
-            <div class="checklist-item" id="stack2" onclick="toggleStack(this)">
-                <div class="check-circle"></div>
-                <div>
-                    <span class="cue-title">The Hardware</span>
-                    <span class="cue-desc">"You wanted the smooth Acmeda winder?"</span>
-                </div>
-            </div>
-            <div class="checklist-item" id="stack3" onclick="toggleStack(this)">
-                <div class="check-circle"></div>
-                <div>
-                    <span class="cue-title">The Outcome</span>
-                    <span class="cue-desc">"You love how this finish suits the room?"</span>
-                </div>
-            </div>
+        <div class="objection-grid">
+            <div class="obj-btn" onclick="enterMaze('step_align')">💰 Budget / Value</div>
+            <div class="obj-btn" onclick="enterMaze('maze_partner')">👫 Partner / Spouse</div>
+            <div class="obj-btn" onclick="enterMaze('maze_shop')">🔍 Product Match</div>
+            <div class="obj-btn" onclick="enterMaze('maze_time')">⏳ Timing</div>
+        </div>
+    </div>
 
-            <button id="revealBtn" class="btn primary hidden" style="margin-top:15px;" onclick="setPitchStage('stage1')">
-                They Agreed. Reveal Price.
-            </button>
+    <div id="step_align" class="card hidden">
+        <h2 style="color:var(--p);">Quality Defense</h2>
+        
+        <div class="rep-prompt urgent">📢 REP: Do not drop quality yet. Align with Client.</div>
+
+        <div class="redirect-box">
+            <span class="redirect-title">The Script</span>
+            <p style="margin:0;">"I mean, I think we <i>could</i> get the price down to that number... but we would have to <b>sacrifice the quality</b> or lose that specific [Fabric/Colour] you loved. <br><br>I really don't want to do that to this room."</p>
         </div>
 
-        <div id="stage1" class="card hidden">
-            <h3>Step 2: The Price Reveal</h3>
-            <div class="prompt-box">
-                <span class="prompt-label">The Script:</span>
-                <span class="prompt-text">"Based on that perfect package we just built, the total investment for the 'Gold Standard' finish is..."</span>
-            </div>
-            <div class="btn-grid">
-                <button class="btn safe" onclick="setPitchStage('stage_win')">Client is Happy (Sign)</button>
-                <button class="btn" onclick="setPitchStage('stage_calib')">Client says: "Ouch" (Wince)</button>
-                <button class="btn danger" onclick="setPitchStage('stage_stall')">Client says: "Not Ready"</button>
-            </div>
+        <div class="btn-grid">
+            <button class="btn btn-primary" onclick="nextStep('step_manager')">Team Up & Call Manager</button>
+            <button class="btn btn-danger" onclick="nextStep('maze_descope')">I don't care. Descope it.</button>
+        </div>
+    </div>
+
+    <div id="step_manager" class="card hidden">
+        <h2 style="color:var(--safe);">The Manager Gambit</h2>
+        
+        <div class="rep-prompt">📢 REP: Put phone on Speaker. Fight for the Client.</div>
+
+        <div class="redirect-box">
+            <span class="redirect-title">The Proposition</span>
+            <p style="margin:0;">"Let's try this: If I call my boss right now and fight for a <b>'Today Only' special price</b> to keep the specs exactly as they are... will you order it with me today?"</p>
         </div>
 
-        <div id="stage_calib" class="card hidden">
-            <h3>Calibration Mode</h3>
-            <div class="prompt-box">
-                <span class="prompt-label">The Script:</span>
-                <span class="prompt-text">"Okay, we have two levers. We can adjust the <b>Product Specs</b> (Descope) or we can look at the <b>Price/Payment</b>."</span>
-            </div>
-            <div class="btn-grid">
-                <button class="btn" onclick="setPitchStage('stage_descope')">Adjust Product (Descope)</button>
-                <button class="btn primary" onclick="setPitchStage('stage_deal')">Deal Maker (Price)</button>
-            </div>
-            <button style="margin-top:20px; border:none; background:none; color:#999; width:100%;" onclick="resetPitch()">Reset Pitch</button>
+        <div class="btn-grid">
+            <button class="btn btn-safe" onclick="nextStep('step_discount_win')">Manager Approved (10%)</button>
+            <button class="btn btn-danger" onclick="nextStep('maze_descope')">Manager Said No (Descope)</button>
+        </div>
+    </div>
+
+    <div id="maze_descope" class="card hidden">
+        <h2 style="color:var(--danger);">Reduce Quality</h2>
+        <p>We tried. To go lower, we MUST remove features.</p>
+
+        <div id="descopeList" style="margin-bottom:20px;">
+            <div class="checklist-item active"><div>10-Year Warranty (Uniline)</div></div>
+            <div class="checklist-item active"><div>Motorisation Upgrade</div></div>
+            <div class="checklist-item active"><div>Z-Frame (Gap Free)</div></div>
         </div>
 
-        <div id="stage_stall" class="card hidden" style="border-top-color:var(--warn);">
-            <h3>The Schedule Reality</h3>
-            <p>They said "Not Ready" or "Just Looking". Pivot to <b>Lead Times</b>.</p>
-            
-            <div class="prompt-box">
-                <span class="prompt-label">The Script:</span>
-                <span class="prompt-text">"I understand. But my main concern is your <b>schedule</b>. <br><br>Lead times are <b>8 Weeks</b>. If we don't finalize this week, you won't have privacy until [Insert Month]. Is it worth risking that delay?"</span>
-            </div>
-
-            <div class="btn-grid">
-                <button class="btn safe" onclick="setPitchStage('stage_win')">"I didn't realize that." (Sign)</button>
-                <button class="btn" onclick="setPitchStage('stage_hailmary')">"We can wait." (Hail Mary)</button>
-            </div>
+        <div class="btn-grid">
+            <button class="btn btn-danger" onclick="doDescope()">Reduce Quality</button>
+            <button class="btn btn-primary" onclick="showDailyCost()">Show Daily Cost</button>
         </div>
 
-        <div id="stage_deal" class="card hidden" style="border-top-color:var(--safe);">
-            <h3>Deal Maker</h3>
-            <div class="prompt-box">
-                <span class="prompt-label">The "If I, Will You?" Close:</span>
-                <span class="prompt-text">"If I can sharpen the pencil to meet your target, would you be happy to sign the paperwork right now?"</span>
-            </div>
-            <div class="btn-grid">
-                <button class="btn safe" onclick="setPitchStage('stage_win')">YES (Call Manager)</button>
-                <button class="btn" onclick="setPitchStage('stage_stall')">MAYBE (Go to Stall)</button>
-            </div>
+        <div id="dailyCostBox" class="redirect-box hidden">
+            <span class="redirect-title">Perspective Shift</span>
+            <p style="margin:0;">"Over the 10-year warranty, the difference is only <b>$2.50 per week</b>. Is it worth sacrificing the quality?"</p>
+            <button class="btn btn-safe btn-full" onclick="nextStep('step_win')">Keep Quality & Sign</button>
         </div>
 
-        <div id="stage_hailmary" class="card hidden">
-            <h3>The Hail Mary</h3>
-            <div class="prompt-box">
-                <span class="prompt-label">The Script:</span>
-                <span class="prompt-text">"Fair enough. But before I pack up—is there <b>anything</b> I could do or say that would win your business today?"</span>
-            </div>
-            <button class="btn" onclick="resetPitch()">Restart</button>
-        </div>
+        <span class="exit-link" onclick="nextStep('step_exit')">The budget is strictly fixed. (Archive Quote)</span>
+    </div>
 
-        <div id="stage_descope" class="card hidden" style="border-top-color:var(--warn);">
-            <h3>Product Descope</h3>
-            <p>Reduce the spec to hit the budget.</p>
-            <ul style="text-align:left; color:#555; margin-bottom:20px;">
-                <li>Remove Motorisation?</li>
-                <li>Change Uniline (10yr) to Shaw (5yr)?</li>
-                <li>Remove Z-Frame?</li>
+    <div id="maze_partner" class="card hidden">
+        <h2 style="color:var(--warn);">Joint Decision</h2>
+        <p>Let's not guess their answer. Let's get a decision now.</p>
+        
+        <div class="redirect-box" style="border-color:var(--warn); background:#fffaf0;">
+            <span class="redirect-title">Protocol</span>
+            <p><b>Question:</b> "If they were here and said YES, would you sign right now?"</p>
+            <ul>
+                <li><b>YES:</b> Then let's FaceTime them.</li>
+                <li><b>NO:</b> Then the partner isn't the issue.</li>
             </ul>
-            <button class="btn" onclick="resetPitch()">Recalculate Price</button>
+        </div>
+        
+        <div class="btn-grid">
+            <button class="btn btn-primary" onclick="nextStep('step_win')">Call & Sign</button>
+            <button class="btn btn-outline" onclick="nextStep('step_crossroads')">It's not the Partner</button>
         </div>
 
-        <div id="stage_win" class="card hidden" style="border-top-color:var(--safe); text-align:center;">
-            <h1 style="font-size:3rem; margin:10px 0;">🎉</h1>
-            <h3>Green Light</h3>
-            <p>Proceed to paperwork.</p>
-            <button class="btn primary" onclick="resetPitch()">New Client</button>
+        <span class="exit-link" onclick="nextStep('step_exit')">Absolute Veto. (Archive Quote)</span>
+    </div>
+
+    <div id="maze_shop" class="card hidden">
+        <h2 style="color:var(--p);">Product Match</h2>
+        <p>Ensure you are comparing "Apples to Apples".</p>
+        
+        <div class="redirect-box">
+            <span class="redirect-title">Competitor Checklist</span>
+            <p>If you shop around, check these 3 things to ensure equal quality:</p>
+            <div class="checklist-item"><div><b>Reinforced Core?</b> (Or simple PVC?)</div></div>
+            <div class="checklist-item"><div><b>Acmeda Hardware?</b> (Or generic?)</div></div>
+            <div class="checklist-item"><div><b>10 Year Warranty?</b> (Or 2 years?)</div></div>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-safe" onclick="nextStep('step_win')">Stick with Quality</button>
+            <button class="btn btn-outline" onclick="nextStep('step_crossroads')">Review Budget Instead</button>
+        </div>
+
+        <span class="exit-link" onclick="nextStep('step_exit')">Don't have what I want. (Archive Quote)</span>
+    </div>
+
+    <div id="maze_time" class="card hidden">
+        <h2 style="color:var(--warn);">Schedule Risk</h2>
+        <p>The issue isn't the order. It's the <b>Logistics</b>.</p>
+
+        <div class="redirect-box" style="border-color:var(--warn); background:#fffaf0;">
+            <span class="redirect-title">Production Reality</span>
+            <div style="font-size:1.2rem; font-weight:800; color:var(--warn); margin:10px 0;">Lead Time: 8 Weeks</div>
+            <p>If we don't secure the slot this week, your install date pushes to <b>[Insert Month]</b>.</p>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-safe" onclick="nextStep('step_win')">Secure Slot</button>
+            <button class="btn btn-outline" onclick="nextStep('step_exit')">Risk the Delay (Exit)</button>
         </div>
     </div>
 
-    <div id="specs" class="content">
-        <input type="text" id="techSearch" class="search-bar" placeholder="Search (e.g. 'acmeda', 'recess', 'lumiere')..." onkeyup="filterTech()">
-        <div id="techList"></div>
+    <div id="step_win" class="card hidden" style="text-align:center; border-left-color:var(--safe);">
+        <h1 style="font-size:4rem; margin-bottom:0;">🎉</h1>
+        <h2 style="color:var(--safe);">Green Light</h2>
+        <p>The project is locked in. Proceeding to paperwork.</p>
+        <button class="btn btn-outline" onclick="emergencyEvac()">Start New Project</button>
     </div>
+
+    <div id="step_discount_win" class="card hidden" style="text-align:center; border-left-color:var(--safe);">
+        <h1 style="font-size:4rem; margin-bottom:0;">🤝</h1>
+        <h2 style="color:var(--safe);">Manager Approved</h2>
+        <p><b>10% Discount Applied.</b><br>Proceed to paperwork immediately.</p>
+        <button class="btn btn-outline" onclick="emergencyEvac()">Start New Project</button>
+    </div>
+
+    <div id="step_exit" class="card hidden" style="text-align:center; border-left-color: #95a5a6;">
+        <h1 style="font-size:4rem; margin-bottom:0; filter: grayscale(1);">📂</h1>
+        <h2 style="color:#7f8c8d;">Project Archived</h2>
+        <p>Quote saved to file. No further action required.</p>
+        <button class="btn btn-outline" onclick="emergencyEvac()">Close Session</button>
+    </div>
+
+</div>
+
+<div id="specs" class="content">
+    <input type="text" id="tSearch" class="search-input" placeholder="Search specs (e.g. acmeda, recess)..." onkeyup="filterTech()">
+    <div id="tList"></div>
+</div>
 
 <script>
-    /* --- LOGIC: POCKET MODE --- */
-    function toggleCheck(el) {
-        el.classList.toggle('checked');
-    }
+    /* --- NAVIGATION --- */
+    function switchTab(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
 
-    function calcDims() {
-        const wVal = document.getElementById('wInput').value;
-        const wUnit = document.getElementById('wUnit').value;
-        const hVal = document.getElementById('hInput').value;
-        const hUnit = document.getElementById('hUnit').value;
-        
-        let finalW = wVal ? (wUnit === 'c' ? Math.round(wVal * 89) : wVal) : "-";
-        let finalH = hVal ? (hUnit === 'c' ? Math.round(hVal * 89) : hVal) : "-";
-        
-        document.getElementById('finalDim').innerText = `${finalW} x ${finalH}`;
-    }
+        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav-' + id).classList.add('active');
 
-    /* --- LOGIC: PITCH MODE --- */
-    let stackCount = 0;
-    function toggleStack(el) {
-        if(!el.classList.contains('checked')) {
-            el.classList.add('checked');
-            stackCount++;
-        } else {
-            el.classList.remove('checked');
-            stackCount--;
+        // Lock-in Logic
+        if(id === 'pitch') {
+            document.getElementById('nav-pocket').classList.add('vanished');
         }
-        
-        // Only show reveal button if 3 yeses
-        if(stackCount >= 3) {
+    }
+
+    /* --- THE MAZE LOGIC --- */
+    let checkCount = 0;
+    function toggleCheck(el) {
+        el.classList.toggle('active');
+        checkCount += el.classList.contains('active') ? 1 : -1;
+        if(checkCount >= 3) {
             document.getElementById('revealBtn').classList.remove('hidden');
         } else {
             document.getElementById('revealBtn').classList.add('hidden');
         }
     }
 
-    function setPitchStage(stageId) {
+    function nextStep(id) {
         document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
-        document.getElementById(stageId).classList.remove('hidden');
+        document.getElementById(id).classList.remove('hidden');
     }
 
-    function resetPitch() {
-        document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
-        document.getElementById('stage0').classList.remove('hidden');
-        document.querySelectorAll('.checklist-item').forEach(el => el.classList.remove('checked'));
-        document.getElementById('revealBtn').classList.add('hidden');
-        stackCount = 0;
+    function enterMaze(pathId) {
+        nextStep(pathId);
     }
 
-    /* --- LOGIC: TECH DATA --- */
-    const techData = [
-        {cat: "Roller Blinds", brand: "Acmeda", title: "Acmeda Hardware Specs", body: "Standard hardware is **Rollease Acmeda**. <br>• Chain winder: RB09 (Smooth). <br>• Tube: 45mm Heavy Duty. <br>• Light Gaps: 15mm (Chain side) / 10mm (Idle side)."},
-        {cat: "Roller Blinds", brand: "Acmeda", title: "Recess Depths (Rollers)", body: "Minimum reveal depth for Flush Mount:<br>• **Single Roller:** 60mm.<br>• **Double Roller:** 135mm.<br>• **Projection:** Single 68mm / Double 145mm."},
-        {cat: "Fabrics", brand: "Uniline / Shaw", title: "Fabric Warranty Tiers", body: "Know your warranty:<br>• **Uniline (Dawn/Uniview):** 10 Year Warranty (Premium).<br>• **Shaw / Wilson:** 5 Year Warranty (Standard)."},
-        {cat: "Shutters", brand: "Lumiere", title: "Lumiere Shutter Specs", body: "Product Name: **Lumiere**.<br>• Core: **Aluminium Reinforced** (Won't warp).<br>• Blade Sizes: 63mm / 89mm (Std) / 114mm.<br>• Max Panel: 750mm (PVC)."},
-        {cat: "Shutters", brand: "Lumiere", title: "Shutter Framing", body: "• **Z-Frame:** Use for out-of-square windows.<br>• **L-Frame:** Inside mount.<br>• **U-Channel:** Fixed panels."},
-        {cat: "Zipscreen", brand: "Acmeda", title: "Zipscreen Dimensions", body: "• **Headbox:** 110mm (Std) / 130mm (Large).<br>• **Side Channels:** 30mm width.<br>• **Wind:** Rated to ~60km/h."},
-        {cat: "Curtains", brand: "Decor", title: "Curtain Stacking", body: "• **S-Fold/Wave:** Stacks to ~30% of width.<br>• **Pinch Pleat:** Stacks to ~25% of width."},
-        {cat: "General", brand: "General", title: "Brick Course Conversion", body: "Standard Vertical Brick Course = **89mm** (including mortar)."}
-    ];
-
-    const listContainer = document.getElementById('techList');
-    techData.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = 'accordion-item';
-        div.innerHTML = `<div class="accordion-header" onclick="toggleAcc(this)"><span>${item.title}</span></div><div class="accordion-body"><span class="brand-tag">${item.brand}</span> <span class="brand-tag" style="background:#eee; color:#555;">${item.cat}</span><p>${item.body}</p></div>`;
-        listContainer.appendChild(div);
-    });
-
-    function filterTech() {
-        const input = document.getElementById('techSearch').value.toLowerCase();
-        document.querySelectorAll('.accordion-item').forEach(item => {
-            item.classList.toggle('hidden', !item.innerText.toLowerCase().includes(input));
+    function doDescope() {
+        const list = document.getElementById('descopeList');
+        const items = list.querySelectorAll('.checklist-item');
+        items.forEach(el => {
+            el.classList.remove('active');
+            el.innerHTML = "<span class='struck'>REMOVED (Standard Quality)</span>";
+            el.style.backgroundColor = "#fff5f5";
+            el.style.borderColor = "#ffcdd2";
         });
     }
 
-    function toggleAcc(header) {
-        header.classList.toggle('active');
-        const body = header.nextElementSibling;
-        body.style.display = body.style.display === 'block' ? 'none' : 'block';
+    function showDailyCost() {
+        document.getElementById('dailyCostBox').classList.remove('hidden');
     }
 
-    function switchTab(id, btn) {
+    function emergencyEvac() {
+        if(confirm("Start New Consultation?")) {
+            document.getElementById('nav-pocket').classList.remove('vanished');
+            // Reset Calc
+            document.getElementById('cInput').value = '';
+            document.getElementById('cResult').innerText = '0 mm';
+            // Reset Search
+            document.getElementById('tSearch').value = '';
+            // Reset Pitch
+            document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
+            document.getElementById('step_value').classList.remove('hidden');
+            document.querySelectorAll('.checklist-item').forEach(el => {
+                el.classList.remove('active');
+                if(el.innerText.includes('REMOVED')) el.innerHTML = "<div>Item Restored</div>"; 
+            });
+            document.getElementById('revealBtn').classList.add('hidden');
+            document.getElementById('dailyCostBox').classList.add('hidden');
+            checkCount = 0;
+            switchTab('pocket');
+        }
+    }
+
+    /* --- SIMPLIFIED CALC --- */
+    function runCalc() {
+        const c = document.getElementById('cInput').value;
+        const res = c ? Math.round(c * 89) : 0;
+        document.getElementById('cResult').innerText = res + " mm";
+    }
+
+    function resetCalc() {
+        document.getElementById('cInput').value = '';
+        document.getElementById('cResult').innerText = '0 mm';
+    }
+
+    /* --- TECH DATA --- */
+    const techDB = [
+        {t: "Acmeda Hardware", b: "Roller Blind Specs: Chain RB09 (Smooth). Tube 45mm Heavy Duty. Light Gaps: 15mm Chain / 10mm Idle."},
+        {t: "Recess Depths", b: "Single Roller: 60mm min depth. Double Roller: 135mm min depth. Flush mount requires square reveal."},
+        {t: "Lumiere Core", b: "Shutters: Aluminium Reinforced Core. Won't warp/crack. 20 Year Warranty. Water resistant."},
+        {t: "Z-Frame vs L-Frame", b: "Use Z-Frame for out-of-square windows to hide gaps. Use L-Frame for inside mount (requires square reveal)."},
+        {t: "Lead Times", b: "Current Standard: 6-8 Weeks. Xmas Cutoff: [Insert Date]."},
+        {t: "Curtain Stack", b: "S-Fold: Stacks to 30% of width. Pinch Pleat: Stacks to 25% of width. Track projection 100mm+."},
+        {t: "Zipscreen Limits", b: "Max Width approx 5.8m. Wind rated to 60km/h. Must retract in high winds."}
+    ];
+
+    const tList = document.getElementById('tList');
+    techDB.forEach(d => {
+        tList.innerHTML += `<div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">${d.t} <span>+</span></div><div class="acc-body">${d.b}</div></div>`;
+    });
+
+    function filterTech() {
+        const v = document.getElementById('tSearch').value.toLowerCase();
+        document.querySelectorAll('.acc-item').forEach(el => {
+            el.style.display = el.innerText.toLowerCase().includes(v) ? 'block' : 'none';
+        });
+    }
+
+    function toggleAcc(el) {
+        const body = el.nextElementSibling;
+        body.style.display = body.style.display === 'block' ? 'none' : 'block';
+        el.querySelector('span').innerText = body.style.display === 'block' ? '-' : '+';
+    }
+
+    function switchTab(id) {
         document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        btn.classList.add('active');
+        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav-' + id).classList.add('active');
+        if(id === 'pitch') document.getElementById('nav-pocket').classList.add('vanished');
     }
 </script>
 
 </body>
 </html>
+
