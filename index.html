@@ -1,14 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sales Psychology Quiz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mega Blinds Diagnostic</title>
+    <style>
+        :root { --p: #004a99; --bg: #f8f9fa; --txt: #212529; --err: #d90429; --acc: #ffc107; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--txt); display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .card { background: #fff; padding: 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 420px; text-align: center; border-top: 8px solid var(--p); transition: all 0.3s ease; }
+        h1 { font-size: 1.6rem; color: var(--p); margin-bottom: 8px; letter-spacing: -0.5px; }
+        p { font-size: 0.95rem; color: #6c757d; margin-bottom: 25px; line-height: 1.4; }
+        .btn { display: block; width: 100%; padding: 18px; margin: 12px 0; border: 2px solid var(--p); border-radius: 14px; background: #fff; color: var(--p); font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
+        .btn:active { background: var(--p); color: #fff; transform: scale(0.98); }
+        .loop-warn { border-color: var(--err); color: var(--err); background: #fff5f5; animation: shake 0.4s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
+        .reality-tag { font-size: 0.8rem; display: block; margin-top: 4px; font-weight: 400; opacity: 0.8; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
-  <h1>Welcome to the Sales Quiz!</h1>
-  <div id="quiz-container">
-    <!-- Quiz will show up here -->
-  </div>
+<div class="card" id="app"></div>
+
+<script>
+    // Logic: Tracking "Stalls" to trigger the Truth Loop
+    let stallPoints = 0;
+
+    const diagnostic = {
+        start: {
+            t: "Project Alignment",
+            s: "Skip the script. I'm a big boy—let's just find the technical solution for your windows.",
+            q: "Where are we actually sitting right now?",
+            b: [
+                { txt: "Ready to roll. Let's do paperwork.", n: 'win', s: false },
+                { txt: "I need to check with my partner.", n: 'partner', s: true },
+                { txt: "It's a bit more than I expected.", n: 'budget', s: true },
+                { txt: "I just need to 'think about it'.", n: 'think', s: true }
+            ]
+        },
+        partner: {
+            t: "The Partner Pivot",
+            s: "Honesty check: Usually this is a 'Safety Net' move.",
+            q: "What's the real conversation going to be?",
+            b: [
+                { txt: "Legit style/color second opinion.", r: "Cool. Let's FaceTime them now.", n: 'call', s: false },
+                { txt: "They're the budget keeper.", r: "Okay, so it's a money conversation.", n: 'budget', s: true },
+                { txt: "I'm using them as a human shield.", r: "I respect the honesty. Let's save the time.", n: 'loop', s: true }
+            ]
+        },
+        budget: {
+            t: "The Investment Wall",
+            s: "Mega Blinds engineering vs. 'Standard' retail.",
+            q: "Where is the friction coming from?",
+            b: [
+                { txt: "I don't see the 89mm value difference.", r: "I haven't explained the engineering well enough.", n: 'tech', s: false },
+                { txt: "Cash flow timing is the issue.", r: "We can fix the dates, that's easy.", n: 'pay', s: false },
+                { txt: "I'm hoping to 'Shop the Spec' for less.", r: "The Spec-Hunter! Bold move.", n: 'loop', s: true }
+            ]
+        },
+        think: {
+            t: "The Thinker",
+            s: "Thinking usually means there's a hidden 'What-If'.",
+            q: "What's the one worry stopping the 'Yes'?",
+            b: [
+                { txt: "I'm worried about light-bleed/failure.", r: "Technical worry. I can fix this in writing.", n: 'guarantee', s: false },
+                { txt: "Too many choices, brain freeze.", r: "Analysis Paralysis. Let's simplify.", n: 'simplify', s: false },
+                { txt: "I'm just being polite.", r: "The Polite No. We're going in circles.", n: 'loop', s: true }
+            ]
+        },
+        loop: {
+            t: "⚠️ Circular Logic Detected",
+            s: "The system thinks we're doing the 'Sales Dance'.",
+            q: "Reality check: Is this project happening, or are we shaking hands as friends?",
+            b: [
+                { txt: "Honestly? It's a 'No' for now.", n: 'exit', s: false },
+                { txt: "It's just the price. Let's talk 89mm value.", n: 'tech', s: false },
+                { txt: "I'm ready. Let's just sign it.", n: 'win', s: false }
+            ]
+        },
+        // Action States
+        win: { t: "Order Confirmed", s: "Excellent choice.", q: "Hand back to the rep to finalize the engineering.", b: [{txt: "Restart Diagnostic", n: 'start'}] },
+        exit: { t: "Professional Exit", s: "No hard feelings.", q: "File closed. No annoying follow-ups coming from me.", b: [{txt: "New Client", n: 'start'}] },
+        call: { t: "The FaceTime Close", s: "Let's dial them in.", q: "If they're happy, are we moving to production today?", b: [{txt: "Back to Start", n: 'start'}] },
+        tech: { t: "The 89mm Engineering", s: "Flush-mount vs. 'Best Guess'.", q: "I'll show you why my layout won't sag or bleed light.", b: [{txt: "Back to Start", n: 'start'}] },
+        pay: { t: "Financial Strategy", s: "Staggered payments.", q: "Let's adjust the deposit to fit your cash flow.", b: [{txt: "Back to Start", n: 'start'}] },
+        guarantee: { t: "Iron-Clad Guarantee", s: "If I put it in writing, does it count?", q: "If I guarantee [Worry] won't happen, are we done?", b: [{txt: "Back to Start", n: 'start'}] },
+        simplify: { t: "Choice Reduction", s: "Pick A or B. Bin the rest.", q: "Which of these two stays in the room?", b: [{txt: "Back to Start", n: 'start'}] }
+    };
+
+    function render(k, isStall) {
+        if (isStall) stallPoints++;
+        if (stallPoints >= 2 && k !== 'loop' && !['win', 'exit'].includes(k)) {
+            k = 'loop';
+            stallPoints = 0;
+        }
+
+        const p = diagnostic[k];
+        const el = document.getElementById('app');
+        el.className = 'card' + (k === 'loop' ? ' loop-warn' : '');
+        
+        el.innerHTML = `<h1>${p.t}</h1><p>${p.s}</p><b>${p.q}</b>` + 
+            p.b.map(btn => `
+                <button class="btn" onclick="render('${btn.n}', ${btn.s || false})">
+                    ${btn.txt}
+                    ${btn.r ? `<span class="reality-tag">(${btn.r})</span>` : ''}
+                </button>
+            `).join('');
+    }
+
+    render('start', false);
+</script>
 </body>
 </html>
+
