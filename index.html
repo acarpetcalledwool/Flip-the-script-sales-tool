@@ -3,100 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Blinds Sales Tool</title>
+    <title>Mega Blinds Companion</title>
     <style>
         :root { 
-            --p: #004a99; 
-            --bg: #f8f9fa; 
+            --p: #004a99; /* Mega Blue */
+            --bg: #f4f6f9; 
             --txt: #212529; 
-            --err: #d90429; 
-            --acc: #ffc107; 
+            --err: #dc3545; 
+            --safe: #28a745;
+            --warn: #ffc107;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--bg); 
             color: var(--txt); 
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            padding: 20px; 
             margin: 0; 
-            min-height: 100vh;
+            padding: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
         }
 
-        /* --- NAV --- */
-        .nav-bar {
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+        /* --- HEADER & TABS --- */
+        .header {
             background: #fff;
-            padding: 5px;
-            border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
         }
-        .nav-item {
+        .nav-pill-container {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .nav-pill {
             flex: 1;
             text-align: center;
-            padding: 12px;
-            border-radius: 40px;
-            cursor: pointer;
+            padding: 10px;
+            font-size: 0.9rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            color: #888;
-            transition: 0.3s;
+            color: #6c757d;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .nav-item.active {
-            background: var(--p);
-            color: #fff;
-            box-shadow: 0 4px 10px rgba(0,74,153,0.2);
-        }
-
-        /* --- VIEWS --- */
-        .view-container {
-            width: 100%;
-            max-width: 420px;
-            display: none;
-        }
-        .view-container.active { display: block; }
-
-        /* --- DIAGNOSTIC STYLES --- */
-        .card { 
-            background: #fff; padding: 30px; border-radius: 24px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
-            text-align: center; border-top: 8px solid var(--p); 
-        }
-        .diag-title { font-size: 1.6rem; color: var(--p); margin: 0 0 8px 0; }
-        .diag-sub { font-size: 0.95rem; color: #6c757d; margin-bottom: 25px; }
-        .diag-q { display: block; margin-bottom: 20px; font-size: 1.05rem; }
-        .btn { 
-            display: block; width: 100%; padding: 18px; margin: 12px 0; 
-            border: 2px solid var(--p); border-radius: 14px; background: #fff; 
-            color: var(--p); font-weight: 700; cursor: pointer; transition: 0.2s; 
-        }
-        .btn:active { background: var(--p); color: #fff; transform: scale(0.98); }
-        .loop-warn { border-color: var(--err); color: var(--err); background: #fff5f5; }
-        .reality-tag { font-size: 0.8rem; display: block; margin-top: 4px; font-weight: 400; opacity: 0.8; }
-
-        /* --- TECH/CALC STYLES --- */
-        .calc-card {
+        .nav-pill.active {
             background: #fff;
+            color: var(--p);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* --- CONTENT AREA --- */
+        .content {
+            flex: 1;
+            overflow-y: auto;
             padding: 20px;
+        }
+        .hidden { display: none; }
+
+        /* --- CARDS & UI --- */
+        .card {
+            background: #fff;
             border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-            border-left: 5px solid var(--acc);
+            text-align: center;
+            border-top: 6px solid var(--p);
+            animation: slideIn 0.3s ease;
         }
-        .calc-title {
-            font-size: 0.9rem;
+
+        .prompt-box {
+            background: #e7f1ff;
+            border-left: 5px solid var(--p);
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+            border-radius: 8px;
+        }
+        .prompt-label {
+            font-size: 0.75rem;
             text-transform: uppercase;
-            color: #888;
+            color: var(--p);
             font-weight: 700;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
         }
-        /* New Input Group Styling */
+        .prompt-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn.primary { border-color: var(--p); color: var(--p); }
+        .btn.danger { border-color: var(--err); color: var(--err); }
+        
+        .sub-text {
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: 400;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* --- CALCULATOR STYLES --- */
         .calc-row {
             display: flex;
             align-items: center;
@@ -106,267 +137,239 @@
             padding: 5px;
             border: 1px solid #eee;
         }
-        .calc-label-side {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            font-size: 0.7rem;
-            color: #aaa;
-            padding: 0 8px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
         .calc-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--p);
-            padding: 10px;
-            outline: none;
-            width: 50px; /* Min width */
+            flex: 1; border: none; background: transparent;
+            font-size: 1.1rem; font-weight: bold; color: var(--p);
+            padding: 10px; outline: none; text-align: center;
         }
         .calc-select {
-            border: none;
-            background: #e9ecef;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
-            color: #555;
-            font-weight: 600;
-            margin-right: 5px;
-            outline: none;
+            border: none; background: #e9ecef; border-radius: 8px;
+            padding: 8px; font-size: 0.8rem; color: #555;
+        }
+        .calc-result {
+            font-size: 1.4rem; font-weight: 800; color: var(--p);
+            margin-top: 10px; font-family: monospace;
         }
 
-        .calc-result-box {
-            background: var(--p);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 15px;
-        }
-        .calc-res-label {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-        .calc-final {
-            font-size: 1.5rem;
-            font-weight: 800;
-            font-family: monospace;
-            letter-spacing: 1px;
-        }
-        
-        /* Search & List */
-        .search-box {
-            width: 100%; padding: 16px; border: none; background: #fff; 
-            border-radius: 14px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-            box-sizing: border-box; outline: none;
-        }
-        .data-card {
-            background: #fff; margin-bottom: 12px; border-radius: 16px; 
-            padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .data-key { font-weight: 600; color: #555; font-size: 0.95rem; }
-        .data-val { 
-            font-family: monospace; color: var(--p); font-weight: 700; 
-            font-size: 1.1rem; background: #ebf2fa; padding: 6px 10px; border-radius: 8px; 
-        }
-        .category-header {
-            font-size: 0.8rem; text-transform: uppercase; color: #aaa; 
-            letter-spacing: 1px; margin: 20px 0 10px 10px; font-weight: 700;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-<div class="nav-bar">
-    <div class="nav-item active" onclick="switchMode('diagnostic', this)">Diagnostic</div>
-    <div class="nav-item" onclick="switchMode('database', this)">Tech Specs</div>
-</div>
+    <div class="header">
+        <div class="nav-pill-container">
+            <div class="nav-pill active" onclick="setTab('pocket')">Pocket Mode</div>
+            <div class="nav-pill" onclick="setTab('pitch')">The Pitch</div>
+            <div class="nav-pill" onclick="setTab('specs')">Data</div>
+        </div>
+    </div>
 
-<div id="diagnostic" class="view-container active">
-    <div class="card" id="app"></div>
-</div>
-
-<div id="database" class="view-container">
-    
-    <div class="calc-card">
-        <div class="calc-title">Plan Decoder</div>
+    <div id="pocket" class="content">
         
-        <div class="calc-row">
-            <div class="calc-label-side">Width</div>
-            <input type="number" id="wInput" class="calc-input" placeholder="Value" oninput="calcDims()">
-            <select id="wUnit" class="calc-select" onchange="calcDims()">
-                <option value="mm" selected>mm</option>
-                <option value="c">Courses</option>
-            </select>
+        <div class="card">
+            <h3>The Vibe Check</h3>
+            <p style="color:#666; font-size:0.9rem;">Establish the ground rules before you measure.</p>
+            
+            <div class="prompt-box">
+                <span class="prompt-label">Ask The Client:</span>
+                <span class="prompt-text">"Before I pull out the laser... Are we measuring to buy today, or are we just 'kicking tyres'?"</span>
+            </div>
+
+            <div class="btn-grid">
+                <button class="btn primary" onclick="showResponse('vibe_real')">
+                    They said: "We're Serious"
+                    <span class="sub-text"> Proceed to Measure.</span>
+                </button>
+                <button class="btn" onclick="showResponse('vibe_tyre')">
+                    They said: "Just Looking"
+                    <span class="sub-text">Switch to 'Speed Quote' mode.</span>
+                </button>
+            </div>
+            <div id="vibe_resp" style="margin-top:15px; font-weight:bold; color:var(--p);"></div>
         </div>
 
-        <div class="calc-row">
-            <div class="calc-label-side">Drop</div>
-            <input type="number" id="hInput" class="calc-input" placeholder="Value" oninput="calcDims()">
-            <select id="hUnit" class="calc-select" onchange="calcDims()">
-                <option value="c" selected>Courses</option>
-                <option value="mm">mm</option>
-            </select>
-        </div>
-
-        <div class="calc-result-box">
-            <div class="calc-res-label">Final Dimensions (mm)</div>
-            <div id="finalDim" class="calc-final">- x -</div>
+        <div class="card">
+            <h3>Plan Decoder</h3>
+            <div class="calc-row">
+                <input type="number" id="wInput" class="calc-input" placeholder="Width" oninput="calcDims()">
+                <select id="wUnit" class="calc-select" onchange="calcDims()"><option value="mm">mm</option><option value="c">Crse</option></select>
+            </div>
+            <div class="calc-row">
+                <input type="number" id="hInput" class="calc-input" placeholder="Height" oninput="calcDims()">
+                <select id="hUnit" class="calc-select" onchange="calcDims()"><option value="c">Crse</option><option value="mm">mm</option></select>
+            </div>
+            <div id="finalDim" class="calc-result">- x -</div>
         </div>
     </div>
 
-    <input type="text" id="dbSearch" class="search-box" placeholder="Search specs..." onkeyup="filterDB()">
-    
-    <div id="dbContent">
-        <div class="category-header">Plantation Shutters</div>
-        <div class="data-card" data-search="shutter blade sizes">
-            <span class="data-key">Blade Sizes</span>
-            <span class="data-val">63 / 89 / 114 mm</span>
-        </div>
-        <div class="data-card" data-search="shutter bi-fold stack">
-            <span class="data-key">Bi-Fold Stacking</span>
-            <span class="data-val">~10% of Width</span>
-        </div>
-        <div class="data-card" data-search="max panel width">
-            <span class="data-key">Max PVC Panel Width</span>
-            <span class="data-val">750 mm</span>
+    <div id="pitch" class="content hidden">
+        
+        <div id="step1" class="card">
+            <h3>Step 1: The Reveal</h3>
+            <p>Present the full retail price. Do NOT discount yet.</p>
+            <div class="prompt-box">
+                <span class="prompt-label">The Script:</span>
+                <span class="prompt-text">"Based on the measurements, the total investment for the premium finish is..."</span>
+            </div>
+            <div class="btn-grid">
+                <button class="btn" onclick="nextStep('step2_ouch')">Client Winces / Says "Ouch"</button>
+                <button class="btn" onclick="nextStep('step2_silent')">Client is Silent (Poker Face)</button>
+                <button class="btn danger" onclick="nextStep('step2_impossible')">Client Laughs / Says "No Way"</button>
+            </div>
         </div>
 
-        <div class="category-header">Blinds & Curtains</div>
-        <div class="data-card" data-search="roller blind recess">
-            <span class="data-key">Roller Recess Depth</span>
-            <span class="data-val">60 mm (Single)</span>
+        <div id="step2_ouch" class="card hidden">
+            <h3>Step 2: The Hesitation</h3>
+            <p>They want it, but the price hurts. Time for the "If I... Will You?"</p>
+            
+            <div class="prompt-box">
+                <span class="prompt-label">Ask The Client:</span>
+                <span class="prompt-text">"I can see you hesitating. If I could sharpen this pencil to meet your target, would you be happy to sign the paperwork right now?"</span>
+            </div>
+
+            <div class="btn-grid">
+                <button class="btn primary" onclick="nextStep('step3_deal')">
+                    They said: "YES"
+                    <span class="sub-text">Commitment locked. Call Manager.</span>
+                </button>
+                <button class="btn" onclick="nextStep('step3_stall')">
+                    They said: "MAYBE"
+                    <span class="sub-text">"I still need to think about it..."</span>
+                </button>
+            </div>
+            <button style="margin-top:15px; border:none; background:none; color:#888;" onclick="resetPitch()">Start Over</button>
         </div>
-        <div class="data-card" data-search="curtain stack s-fold">
-            <span class="data-key">S-Fold Stack</span>
-            <span class="data-val">~30% of Width</span>
+
+        <div id="step2_impossible" class="card hidden">
+            <h3>Step 2: The Reality Check</h3>
+            <p>The gap is too big for a discount. We need to Descope.</p>
+            
+            <div class="prompt-box">
+                <span class="prompt-label">Ask The Client:</span>
+                <span class="prompt-text">"Okay, I've clearly over-specced this. To fit the budget, should we change the Fabric or remove the Motorisation?"</span>
+            </div>
+
+            <div class="btn-grid">
+                <button class="btn" onclick="resetPitch()">Recalculate Quote</button>
+                <button class="btn danger" onclick="nextStep('step3_exit')">They won't budge (Exit)</button>
+            </div>
+        </div>
+
+        <div id="step3_stall" class="card hidden">
+            <h3>The Stall Detector</h3>
+            <p>They wouldn't commit. What is the excuse?</p>
+            <div class="btn-grid">
+                <button class="btn" onclick="showObjection('partner')">"Need to ask Partner"</button>
+                <button class="btn" onclick="showObjection('think')">"Need to Think about it"</button>
+                <button class="btn" onclick="showObjection('shop')">"Getting other Quotes"</button>
+            </div>
+            
+            <div id="obj_response" class="prompt-box hidden" style="background:#fff3cd; border-color:#ffc107;">
+                <span class="prompt-label">The Response:</span>
+                <span id="obj_text" class="prompt-text"></span>
+            </div>
+            <button style="margin-top:15px; border:none; background:none; color:#888;" onclick="resetPitch()">Start Over</button>
+        </div>
+
+        <div id="step3_deal" class="card hidden" style="border-top-color: var(--safe);">
+            <h3>🎉 Green Light</h3>
+            <p>They committed. You are safe to discount.</p>
+            <div class="prompt-box">
+                <span class="prompt-label">Action:</span>
+                <span class="prompt-text">"Fantastic. Let me call my manager to get approval for that number. Get the paperwork ready."</span>
+            </div>
+            <button class="btn primary" onclick="resetPitch()">New Client</button>
         </div>
     </div>
-</div>
+
+    <div id="specs" class="content hidden">
+        <div class="card">
+            <h3>Cheat Guide</h3>
+            <input type="text" id="dbSearch" placeholder="Search specs..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;" onkeyup="filterDB()">
+            <div id="dbList" style="text-align:left; margin-top:15px;">
+                </div>
+        </div>
+    </div>
 
 <script>
-    /* --- PLAN DECODER LOGIC --- */
+    // --- NAVIGATION ---
+    function setTab(id) {
+        document.querySelectorAll('.content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    // --- POCKET MODE LOGIC ---
+    function showResponse(type) {
+        const div = document.getElementById('vibe_resp');
+        if(type === 'vibe_real') div.innerText = "Excellent. Get the Laser.";
+        if(type === 'vibe_tyre') div.innerText = "Action: Measure 1 window only as a 'Sample Quote'.";
+    }
+
     function calcDims() {
         const wVal = document.getElementById('wInput').value;
         const wUnit = document.getElementById('wUnit').value;
         const hVal = document.getElementById('hInput').value;
         const hUnit = document.getElementById('hUnit').value;
         
-        const res = document.getElementById('finalDim');
+        let finalW = wVal ? (wUnit === 'c' ? Math.round(wVal * 89) : wVal) : "-";
+        let finalH = hVal ? (hUnit === 'c' ? Math.round(hVal * 89) : hVal) : "-";
         
-        let finalW = "-";
-        let finalH = "-";
-
-        // Calculate Width
-        if (wVal) {
-            finalW = (wUnit === 'c') ? Math.round(wVal * 89) : wVal;
-        }
-
-        // Calculate Height
-        if (hVal) {
-            finalH = (hUnit === 'c') ? Math.round(hVal * 89) : hVal;
-        }
-
-        res.innerText = `${finalW} x ${finalH}`;
+        document.getElementById('finalDim').innerText = `${finalW} x ${finalH}`;
     }
 
-    /* --- MODE SWITCHING --- */
-    function switchMode(modeId, btn) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
-        document.getElementById(modeId).classList.add('active');
+    // --- PITCH MODE LOGIC ---
+    function nextStep(id) {
+        document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
     }
 
-    /* --- DB SEARCH --- */
+    function resetPitch() {
+        document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
+        document.getElementById('step1').classList.remove('hidden');
+        document.getElementById('obj_response').classList.add('hidden');
+    }
+
+    function showObjection(type) {
+        const box = document.getElementById('obj_response');
+        const txt = document.getElementById('obj_text');
+        box.classList.remove('hidden');
+
+        if(type === 'partner') {
+            txt.innerText = "⚠️ Truth Check: \"Is this a polite 'No'? If they were here right now, would we be signing? Let's FaceTime them.\"";
+        } else if (type === 'think') {
+            txt.innerText = "⚠️ Reality Check: \"Usually 'Thinking' means 'Googling Cheaper Stuff'. What is the ONE worry stopping you?\"";
+        } else if (type === 'shop') {
+            txt.innerText = "⚠️ Value Check: \"Smart. But if you don't have my final price, you have nothing to compare them to. Let me be the benchmark.\"";
+        }
+    }
+
+    // --- DATA LOGIC ---
+    const dbData = [
+        {k:"Brick Course", v:"89mm"},
+        {k:"Roller Recess", v:"60mm"},
+        {k:"S-Fold Stack", v:"~30% Width"},
+        {k:"Shutter Blade", v:"63/89/114mm"},
+        {k:"Door Height", v:"2040mm Std"}
+    ];
+    
+    const list = document.getElementById('dbList');
+    dbData.forEach(d => {
+        list.innerHTML += `<div class="db-item" style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"><b>${d.k}</b><span style="font-family:monospace; color:var(--p);">${d.v}</span></div>`;
+    });
+
     function filterDB() {
-        const input = document.getElementById('dbSearch').value.toLowerCase();
-        const items = document.querySelectorAll('.data-card');
-        const headers = document.querySelectorAll('.category-header');
-        
-        items.forEach(item => {
-            const term = item.getAttribute('data-search');
-            item.style.display = term.includes(input) ? "flex" : "none";
-        });
-        
-        headers.forEach(h => {
-            h.style.display = input.length > 0 ? 'none' : 'block';
+        const term = document.getElementById('dbSearch').value.toLowerCase();
+        const items = document.querySelectorAll('.db-item');
+        items.forEach(i => {
+            i.style.display = i.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
         });
     }
-
-    /* --- DIAGNOSTIC LOGIC --- */
-    let stallPoints = 0;
-    const diagnostic = {
-        start: {
-            t: "Project Alignment", s: "Skip the script. Find the technical solution.", q: "Current status?",
-            b: [
-                { txt: "Ready to roll.", n: 'win', s: false },
-                { txt: "Check with partner.", n: 'partner', s: true },
-                { txt: "Over budget.", n: 'budget', s: true },
-                { txt: "Thinking about it.", n: 'think', s: true }
-            ]
-        },
-        partner: {
-            t: "The Partner Pivot", s: "Is this a safety net?", q: "Real conversation?",
-            b: [
-                { txt: "Design opinion.", r: "FaceTime them.", n: 'call', s: false },
-                { txt: "Budget keeper.", r: "Money talk.", n: 'budget', s: true },
-                { txt: "Human shield.", r: "Save the time.", n: 'loop', s: true }
-            ]
-        },
-        budget: {
-            t: "The Investment Wall", s: "Engineering vs. Standard retail.", q: "Where is the friction?",
-            b: [
-                { txt: "Don't see value.", r: "Explain engineering.", n: 'tech', s: false },
-                { txt: "Cash flow.", r: "Fix dates.", n: 'pay', s: false },
-                { txt: "Shopping around.", r: "Spec-Hunter.", n: 'loop', s: true }
-            ]
-        },
-        think: {
-            t: "The Thinker", s: "Hidden 'What-If'.", q: "What's stopping the Yes?",
-            b: [
-                { txt: "Worried about failure.", r: "Written guarantee.", n: 'guarantee', s: false },
-                { txt: "Too many choices.", r: "Simplify.", n: 'simplify', s: false },
-                { txt: "Just polite.", r: "Polite No.", n: 'loop', s: true }
-            ]
-        },
-        loop: {
-            t: "⚠️ Circular Logic", s: "We are doing the 'Sales Dance'.", q: "Is this happening?",
-            b: [
-                { txt: "It's a No.", n: 'exit', s: false },
-                { txt: "Just price.", n: 'tech', s: false },
-                { txt: "Let's sign.", n: 'win', s: false }
-            ]
-        },
-        win: { t: "Order Confirmed", s: "Excellent.", q: "Finalize engineering.", b: [{txt: "Restart", n: 'start'}] },
-        exit: { t: "Professional Exit", s: "No hard feelings.", q: "File closed.", b: [{txt: "New Client", n: 'start'}] },
-        call: { t: "FaceTime Close", s: "Dial them in.", q: "Moving to production?", b: [{txt: "Restart", n: 'start'}] },
-        tech: { t: "Engineering Value", s: "Flush-mount vs. Guess.", q: "Why my layout works.", b: [{txt: "Restart", n: 'start'}] },
-        pay: { t: "Financial Strategy", s: "Staggered payments.", q: "Adjust deposit.", b: [{txt: "Restart", n: 'start'}] },
-        guarantee: { t: "Iron-Clad", s: "Written promise.", q: "If I guarantee it, are we done?", b: [{txt: "Restart", n: 'start'}] },
-        simplify: { t: "Choice Reduction", s: "Pick A or B.", q: "Which one stays?", b: [{txt: "Restart", n: 'start'}] }
-    };
-
-    function render(k, isStall) {
-        if (isStall) stallPoints++;
-        if (stallPoints >= 2 && k !== 'loop' && !['win', 'exit'].includes(k)) {
-            k = 'loop'; stallPoints = 0;
-        }
-        const p = diagnostic[k];
-        const el = document.getElementById('app');
-        if (k === 'loop') el.classList.add('loop-warn'); else el.classList.remove('loop-warn');
-        
-        el.innerHTML = `<h1 class="diag-title">${p.t}</h1><p class="diag-sub">${p.s}</p><b class="diag-q">${p.q}</b>` + 
-            p.b.map(btn => `<button class="btn" onclick="render('${btn.n}', ${btn.s||false})">${btn.txt}${btn.r?`<span class="reality-tag">(${btn.r})</span>`:''}</button>`).join('');
-    }
-    render('start', false);
 </script>
+
 </body>
 </html>
-
