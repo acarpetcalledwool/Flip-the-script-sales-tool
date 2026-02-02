@@ -1,112 +1,377 @@
+This is a smart catch. If you get an older hand-drawn plan or a specific architectural style where everything is in courses (or everything is in mm), the previous tool would have failed you.
+I have updated the Plan Decoder to be fully flexible.
+The Upgrade:
+I added Unit Toggles next to both Width and Height.
+ * Default State: Matches your "Modern Standard" (Width = mm, Height = Courses).
+ * The Fix: You can now just tap the dropdown to swap Width to "Courses" or Height to "mm" if you encounter one of those rare exceptions.
+Here is the updated code:
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Blinds Diagnostic</title>
+    <title>Mega Blinds Sales Tool</title>
     <style>
-        :root { --p: #004a99; --bg: #f8f9fa; --txt: #212529; --err: #d90429; --acc: #ffc107; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--txt); display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .card { background: #fff; padding: 30px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 420px; text-align: center; border-top: 8px solid var(--p); transition: all 0.3s ease; }
-        h1 { font-size: 1.6rem; color: var(--p); margin-bottom: 8px; letter-spacing: -0.5px; }
-        p { font-size: 0.95rem; color: #6c757d; margin-bottom: 25px; line-height: 1.4; }
-        .btn { display: block; width: 100%; padding: 18px; margin: 12px 0; border: 2px solid var(--p); border-radius: 14px; background: #fff; color: var(--p); font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 1rem; -webkit-tap-highlight-color: transparent; }
+        :root { 
+            --p: #004a99; 
+            --bg: #f8f9fa; 
+            --txt: #212529; 
+            --err: #d90429; 
+            --acc: #ffc107; 
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--txt); 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh;
+        }
+
+        /* --- NAV --- */
+        .nav-bar {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 5px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #888;
+            transition: 0.3s;
+        }
+        .nav-item.active {
+            background: var(--p);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0,74,153,0.2);
+        }
+
+        /* --- VIEWS --- */
+        .view-container {
+            width: 100%;
+            max-width: 420px;
+            display: none;
+        }
+        .view-container.active { display: block; }
+
+        /* --- DIAGNOSTIC STYLES --- */
+        .card { 
+            background: #fff; padding: 30px; border-radius: 24px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            text-align: center; border-top: 8px solid var(--p); 
+        }
+        .diag-title { font-size: 1.6rem; color: var(--p); margin: 0 0 8px 0; }
+        .diag-sub { font-size: 0.95rem; color: #6c757d; margin-bottom: 25px; }
+        .diag-q { display: block; margin-bottom: 20px; font-size: 1.05rem; }
+        .btn { 
+            display: block; width: 100%; padding: 18px; margin: 12px 0; 
+            border: 2px solid var(--p); border-radius: 14px; background: #fff; 
+            color: var(--p); font-weight: 700; cursor: pointer; transition: 0.2s; 
+        }
         .btn:active { background: var(--p); color: #fff; transform: scale(0.98); }
-        .loop-warn { border-color: var(--err); color: var(--err); background: #fff5f5; animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
+        .loop-warn { border-color: var(--err); color: var(--err); background: #fff5f5; }
         .reality-tag { font-size: 0.8rem; display: block; margin-top: 4px; font-weight: 400; opacity: 0.8; }
-        .hidden { display: none; }
+
+        /* --- TECH/CALC STYLES --- */
+        .calc-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--acc);
+        }
+        .calc-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        /* New Input Group Styling */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            border: 1px solid #eee;
+        }
+        .calc-label-side {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 0.7rem;
+            color: #aaa;
+            padding: 0 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .calc-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--p);
+            padding: 10px;
+            outline: none;
+            width: 50px; /* Min width */
+        }
+        .calc-select {
+            border: none;
+            background: #e9ecef;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            color: #555;
+            font-weight: 600;
+            margin-right: 5px;
+            outline: none;
+        }
+
+        .calc-result-box {
+            background: var(--p);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .calc-res-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .calc-final {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        
+        /* Search & List */
+        .search-box {
+            width: 100%; padding: 16px; border: none; background: #fff; 
+            border-radius: 14px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            box-sizing: border-box; outline: none;
+        }
+        .data-card {
+            background: #fff; margin-bottom: 12px; border-radius: 16px; 
+            padding: 15px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .data-key { font-weight: 600; color: #555; font-size: 0.95rem; }
+        .data-val { 
+            font-family: monospace; color: var(--p); font-weight: 700; 
+            font-size: 1.1rem; background: #ebf2fa; padding: 6px 10px; border-radius: 8px; 
+        }
+        .category-header {
+            font-size: 0.8rem; text-transform: uppercase; color: #aaa; 
+            letter-spacing: 1px; margin: 20px 0 10px 10px; font-weight: 700;
+        }
     </style>
 </head>
 <body>
-<div class="card" id="app"></div>
+
+<div class="nav-bar">
+    <div class="nav-item active" onclick="switchMode('diagnostic', this)">Diagnostic</div>
+    <div class="nav-item" onclick="switchMode('database', this)">Tech Specs</div>
+</div>
+
+<div id="diagnostic" class="view-container active">
+    <div class="card" id="app"></div>
+</div>
+
+<div id="database" class="view-container">
+    
+    <div class="calc-card">
+        <div class="calc-title">Plan Decoder</div>
+        
+        <div class="calc-row">
+            <div class="calc-label-side">Width</div>
+            <input type="number" id="wInput" class="calc-input" placeholder="Value" oninput="calcDims()">
+            <select id="wUnit" class="calc-select" onchange="calcDims()">
+                <option value="mm" selected>mm</option>
+                <option value="c">Courses</option>
+            </select>
+        </div>
+
+        <div class="calc-row">
+            <div class="calc-label-side">Drop</div>
+            <input type="number" id="hInput" class="calc-input" placeholder="Value" oninput="calcDims()">
+            <select id="hUnit" class="calc-select" onchange="calcDims()">
+                <option value="c" selected>Courses</option>
+                <option value="mm">mm</option>
+            </select>
+        </div>
+
+        <div class="calc-result-box">
+            <div class="calc-res-label">Final Dimensions (mm)</div>
+            <div id="finalDim" class="calc-final">- x -</div>
+        </div>
+    </div>
+
+    <input type="text" id="dbSearch" class="search-box" placeholder="Search specs..." onkeyup="filterDB()">
+    
+    <div id="dbContent">
+        <div class="category-header">Plantation Shutters</div>
+        <div class="data-card" data-search="shutter blade sizes">
+            <span class="data-key">Blade Sizes</span>
+            <span class="data-val">63 / 89 / 114 mm</span>
+        </div>
+        <div class="data-card" data-search="shutter bi-fold stack">
+            <span class="data-key">Bi-Fold Stacking</span>
+            <span class="data-val">~10% of Width</span>
+        </div>
+        <div class="data-card" data-search="max panel width">
+            <span class="data-key">Max PVC Panel Width</span>
+            <span class="data-val">750 mm</span>
+        </div>
+
+        <div class="category-header">Blinds & Curtains</div>
+        <div class="data-card" data-search="roller blind recess">
+            <span class="data-key">Roller Recess Depth</span>
+            <span class="data-val">60 mm (Single)</span>
+        </div>
+        <div class="data-card" data-search="curtain stack s-fold">
+            <span class="data-key">S-Fold Stack</span>
+            <span class="data-val">~30% of Width</span>
+        </div>
+    </div>
+</div>
 
 <script>
-    // Logic: Tracking "Stalls" to trigger the Truth Loop
-    let stallPoints = 0;
+    /* --- PLAN DECODER LOGIC --- */
+    function calcDims() {
+        const wVal = document.getElementById('wInput').value;
+        const wUnit = document.getElementById('wUnit').value;
+        const hVal = document.getElementById('hInput').value;
+        const hUnit = document.getElementById('hUnit').value;
+        
+        const res = document.getElementById('finalDim');
+        
+        let finalW = "-";
+        let finalH = "-";
 
+        // Calculate Width
+        if (wVal) {
+            finalW = (wUnit === 'c') ? Math.round(wVal * 89) : wVal;
+        }
+
+        // Calculate Height
+        if (hVal) {
+            finalH = (hUnit === 'c') ? Math.round(hVal * 89) : hVal;
+        }
+
+        res.innerText = `${finalW} x ${finalH}`;
+    }
+
+    /* --- MODE SWITCHING --- */
+    function switchMode(modeId, btn) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+        document.getElementById(modeId).classList.add('active');
+    }
+
+    /* --- DB SEARCH --- */
+    function filterDB() {
+        const input = document.getElementById('dbSearch').value.toLowerCase();
+        const items = document.querySelectorAll('.data-card');
+        const headers = document.querySelectorAll('.category-header');
+        
+        items.forEach(item => {
+            const term = item.getAttribute('data-search');
+            item.style.display = term.includes(input) ? "flex" : "none";
+        });
+        
+        headers.forEach(h => {
+            h.style.display = input.length > 0 ? 'none' : 'block';
+        });
+    }
+
+    /* --- DIAGNOSTIC LOGIC --- */
+    let stallPoints = 0;
     const diagnostic = {
         start: {
-            t: "Project Alignment",
-            s: "Skip the script. I'm a big boy—let's just find the technical solution for your windows.",
-            q: "Where are we actually sitting right now?",
+            t: "Project Alignment", s: "Skip the script. Find the technical solution.", q: "Current status?",
             b: [
-                { txt: "Ready to roll. Let's do paperwork.", n: 'win', s: false },
-                { txt: "I need to check with my partner.", n: 'partner', s: true },
-                { txt: "It's a bit more than I expected.", n: 'budget', s: true },
-                { txt: "I just need to 'think about it'.", n: 'think', s: true }
+                { txt: "Ready to roll.", n: 'win', s: false },
+                { txt: "Check with partner.", n: 'partner', s: true },
+                { txt: "Over budget.", n: 'budget', s: true },
+                { txt: "Thinking about it.", n: 'think', s: true }
             ]
         },
         partner: {
-            t: "The Partner Pivot",
-            s: "Honesty check: Usually this is a 'Safety Net' move.",
-            q: "What's the real conversation going to be?",
+            t: "The Partner Pivot", s: "Is this a safety net?", q: "Real conversation?",
             b: [
-                { txt: "Legit style/color second opinion.", r: "Cool. Let's FaceTime them now.", n: 'call', s: false },
-                { txt: "They're the budget keeper.", r: "Okay, so it's a money conversation.", n: 'budget', s: true },
-                { txt: "I'm using them as a human shield.", r: "I respect the honesty. Let's save the time.", n: 'loop', s: true }
+                { txt: "Design opinion.", r: "FaceTime them.", n: 'call', s: false },
+                { txt: "Budget keeper.", r: "Money talk.", n: 'budget', s: true },
+                { txt: "Human shield.", r: "Save the time.", n: 'loop', s: true }
             ]
         },
         budget: {
-            t: "The Investment Wall",
-            s: "Mega Blinds engineering vs. 'Standard' retail.",
-            q: "Where is the friction coming from?",
+            t: "The Investment Wall", s: "Engineering vs. Standard retail.", q: "Where is the friction?",
             b: [
-                { txt: "I don't see the 89mm value difference.", r: "I haven't explained the engineering well enough.", n: 'tech', s: false },
-                { txt: "Cash flow timing is the issue.", r: "We can fix the dates, that's easy.", n: 'pay', s: false },
-                { txt: "I'm hoping to 'Shop the Spec' for less.", r: "The Spec-Hunter! Bold move.", n: 'loop', s: true }
+                { txt: "Don't see value.", r: "Explain engineering.", n: 'tech', s: false },
+                { txt: "Cash flow.", r: "Fix dates.", n: 'pay', s: false },
+                { txt: "Shopping around.", r: "Spec-Hunter.", n: 'loop', s: true }
             ]
         },
         think: {
-            t: "The Thinker",
-            s: "Thinking usually means there's a hidden 'What-If'.",
-            q: "What's the one worry stopping the 'Yes'?",
+            t: "The Thinker", s: "Hidden 'What-If'.", q: "What's stopping the Yes?",
             b: [
-                { txt: "I'm worried about light-bleed/failure.", r: "Technical worry. I can fix this in writing.", n: 'guarantee', s: false },
-                { txt: "Too many choices, brain freeze.", r: "Analysis Paralysis. Let's simplify.", n: 'simplify', s: false },
-                { txt: "I'm just being polite.", r: "The Polite No. We're going in circles.", n: 'loop', s: true }
+                { txt: "Worried about failure.", r: "Written guarantee.", n: 'guarantee', s: false },
+                { txt: "Too many choices.", r: "Simplify.", n: 'simplify', s: false },
+                { txt: "Just polite.", r: "Polite No.", n: 'loop', s: true }
             ]
         },
         loop: {
-            t: "⚠️ Circular Logic Detected",
-            s: "The system thinks we're doing the 'Sales Dance'.",
-            q: "Reality check: Is this project happening, or are we shaking hands as friends?",
+            t: "⚠️ Circular Logic", s: "We are doing the 'Sales Dance'.", q: "Is this happening?",
             b: [
-                { txt: "Honestly? It's a 'No' for now.", n: 'exit', s: false },
-                { txt: "It's just the price. Let's talk 89mm value.", n: 'tech', s: false },
-                { txt: "I'm ready. Let's just sign it.", n: 'win', s: false }
+                { txt: "It's a No.", n: 'exit', s: false },
+                { txt: "Just price.", n: 'tech', s: false },
+                { txt: "Let's sign.", n: 'win', s: false }
             ]
         },
-        // Action States
-        win: { t: "Order Confirmed", s: "Excellent choice.", q: "Hand back to the rep to finalize the engineering.", b: [{txt: "Restart Diagnostic", n: 'start'}] },
-        exit: { t: "Professional Exit", s: "No hard feelings.", q: "File closed. No annoying follow-ups coming from me.", b: [{txt: "New Client", n: 'start'}] },
-        call: { t: "The FaceTime Close", s: "Let's dial them in.", q: "If they're happy, are we moving to production today?", b: [{txt: "Back to Start", n: 'start'}] },
-        tech: { t: "The 89mm Engineering", s: "Flush-mount vs. 'Best Guess'.", q: "I'll show you why my layout won't sag or bleed light.", b: [{txt: "Back to Start", n: 'start'}] },
-        pay: { t: "Financial Strategy", s: "Staggered payments.", q: "Let's adjust the deposit to fit your cash flow.", b: [{txt: "Back to Start", n: 'start'}] },
-        guarantee: { t: "Iron-Clad Guarantee", s: "If I put it in writing, does it count?", q: "If I guarantee [Worry] won't happen, are we done?", b: [{txt: "Back to Start", n: 'start'}] },
-        simplify: { t: "Choice Reduction", s: "Pick A or B. Bin the rest.", q: "Which of these two stays in the room?", b: [{txt: "Back to Start", n: 'start'}] }
+        win: { t: "Order Confirmed", s: "Excellent.", q: "Finalize engineering.", b: [{txt: "Restart", n: 'start'}] },
+        exit: { t: "Professional Exit", s: "No hard feelings.", q: "File closed.", b: [{txt: "New Client", n: 'start'}] },
+        call: { t: "FaceTime Close", s: "Dial them in.", q: "Moving to production?", b: [{txt: "Restart", n: 'start'}] },
+        tech: { t: "Engineering Value", s: "Flush-mount vs. Guess.", q: "Why my layout works.", b: [{txt: "Restart", n: 'start'}] },
+        pay: { t: "Financial Strategy", s: "Staggered payments.", q: "Adjust deposit.", b: [{txt: "Restart", n: 'start'}] },
+        guarantee: { t: "Iron-Clad", s: "Written promise.", q: "If I guarantee it, are we done?", b: [{txt: "Restart", n: 'start'}] },
+        simplify: { t: "Choice Reduction", s: "Pick A or B.", q: "Which one stays?", b: [{txt: "Restart", n: 'start'}] }
     };
 
     function render(k, isStall) {
         if (isStall) stallPoints++;
         if (stallPoints >= 2 && k !== 'loop' && !['win', 'exit'].includes(k)) {
-            k = 'loop';
-            stallPoints = 0;
+            k = 'loop'; stallPoints = 0;
         }
-
         const p = diagnostic[k];
         const el = document.getElementById('app');
-        el.className = 'card' + (k === 'loop' ? ' loop-warn' : '');
+        if (k === 'loop') el.classList.add('loop-warn'); else el.classList.remove('loop-warn');
         
-        el.innerHTML = `<h1>${p.t}</h1><p>${p.s}</p><b>${p.q}</b>` + 
-            p.b.map(btn => `
-                <button class="btn" onclick="render('${btn.n}', ${btn.s || false})">
-                    ${btn.txt}
-                    ${btn.r ? `<span class="reality-tag">(${btn.r})</span>` : ''}
-                </button>
-            `).join('');
+        el.innerHTML = `<h1 class="diag-title">${p.t}</h1><p class="diag-sub">${p.s}</p><b class="diag-q">${p.q}</b>` + 
+            p.b.map(btn => `<button class="btn" onclick="render('${btn.n}', ${btn.s||false})">${btn.txt}${btn.r?`<span class="reality-tag">(${btn.r})</span>`:''}</button>`).join('');
     }
-
     render('start', false);
 </script>
 </body>
