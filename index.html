@@ -7,14 +7,15 @@
     <style>
         :root { 
             --p: #004a99; /* Mega Blue */
-            --bg: #f4f6f9; 
+            --bg: #f8f9fa; 
             --txt: #212529; 
-            --err: #dc3545; 
+            --err: #d90429; 
             --safe: #28a745;
             --warn: #ffc107;
+            --card-bg: #ffffff;
         }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background: var(--bg); 
             color: var(--txt); 
             margin: 0; 
@@ -22,292 +23,397 @@
             display: flex; 
             flex-direction: column; 
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* --- HEADER & TABS --- */
+        /* --- HEADER --- */
         .header {
-            background: #fff;
+            background: var(--card-bg);
             padding: 10px 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .nav-pill-container {
             display: flex;
             background: #e9ecef;
-            border-radius: 12px;
+            border-radius: 20px;
             padding: 4px;
+            width: 100%;
+            max-width: 500px;
         }
         .nav-pill {
             flex: 1;
             text-align: center;
-            padding: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: 10px 5px;
+            font-size: 0.85rem;
+            font-weight: 700;
             color: #6c757d;
-            border-radius: 10px;
+            border-radius: 16px;
             cursor: pointer;
             transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .nav-pill.active {
-            background: #fff;
+            background: var(--card-bg);
             color: var(--p);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- CONTENT AREA --- */
+        /* --- CONTENT --- */
         .content {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: none;
         }
-        .hidden { display: none; }
+        .content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- CARDS & UI --- */
         .card {
-            background: #fff;
+            background: var(--card-bg);
             border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
             margin-bottom: 20px;
-            text-align: center;
-            border-top: 6px solid var(--p);
-            animation: slideIn 0.3s ease;
+            border-top: 5px solid var(--p);
         }
+        .card h3 { margin-top: 0; color: var(--p); font-size: 1.1rem; }
+        .card p { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; }
 
+        /* --- PROMPT BOX --- */
         .prompt-box {
-            background: #e7f1ff;
-            border-left: 5px solid var(--p);
+            background: #eef4fc;
+            border-left: 4px solid var(--p);
             padding: 15px;
-            margin: 15px 0;
-            text-align: left;
             border-radius: 8px;
+            margin-bottom: 20px;
         }
         .prompt-label {
-            font-size: 0.75rem;
+            display: block;
+            font-size: 0.7rem;
             text-transform: uppercase;
             color: var(--p);
-            font-weight: 700;
-            display: block;
-            margin-bottom: 5px;
+            font-weight: 800;
+            margin-bottom: 6px;
         }
         .prompt-text {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            color: #333;
-            line-height: 1.4;
+            color: #2c3e50;
         }
 
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-top: 20px;
-        }
+        /* --- BUTTONS --- */
+        .btn-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         .btn {
             background: #fff;
             border: 2px solid #e9ecef;
-            padding: 16px;
+            padding: 15px;
             border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             color: #495057;
             cursor: pointer;
             text-align: left;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .btn:active { transform: scale(0.98); background: #f8f9fa; }
+        .btn-sub { display: block; font-size: 0.8rem; color: #999; font-weight: normal; margin-top: 4px; }
+        
+        .btn.primary { border-color: var(--p); color: var(--p); background: #f0f7ff; }
+        .btn.danger { border-color: var(--err); color: var(--err); background: #fff5f5; }
+        .btn.safe { border-color: var(--safe); color: var(--safe); background: #f0fff4; }
+
+        /* --- CHECKLIST (YES LADDER) --- */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
             transition: 0.2s;
         }
-        .btn:active { transform: scale(0.98); }
-        .btn.primary { border-color: var(--p); color: var(--p); }
-        .btn.danger { border-color: var(--err); color: var(--err); }
-        
-        .sub-text {
-            font-size: 0.85rem;
-            color: #888;
-            font-weight: 400;
-            display: block;
-            margin-top: 4px;
+        .checklist-item.checked {
+            background: #f0fff4;
+            border-color: var(--safe);
         }
+        .check-circle {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 2px solid #ccc; margin-right: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .checklist-item.checked .check-circle {
+            border-color: var(--safe); background: var(--safe); color: white;
+        }
+        .check-circle:after { content: '✓'; font-size: 0.8rem; display: none; }
+        .checklist-item.checked .check-circle:after { display: block; }
+        
+        .cue-title { font-weight: 800; font-size: 0.85rem; color: #333; display: block; margin-bottom: 2px; }
+        .cue-desc { font-size: 0.9rem; color: #666; font-style: italic; }
 
-        /* --- CALCULATOR STYLES --- */
+        /* --- CALCULATOR --- */
         .calc-row {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
             background: #f8f9fa;
+            border: 1px solid #dee2e6;
             border-radius: 10px;
             padding: 5px;
-            border: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+        .calc-label-side {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 0.65rem;
+            color: #adb5bd;
+            padding: 0 6px;
+            font-weight: 800;
+            text-transform: uppercase;
         }
         .calc-input {
             flex: 1; border: none; background: transparent;
-            font-size: 1.1rem; font-weight: bold; color: var(--p);
-            padding: 10px; outline: none; text-align: center;
+            font-size: 1.2rem; font-weight: 700; color: var(--p);
+            padding: 10px; outline: none; text-align: center; width: 50px;
         }
         .calc-select {
             border: none; background: #e9ecef; border-radius: 8px;
-            padding: 8px; font-size: 0.8rem; color: #555;
+            padding: 8px 12px; font-size: 0.8rem; color: #495057; font-weight: 600; outline: none;
         }
-        .calc-result {
-            font-size: 1.4rem; font-weight: 800; color: var(--p);
-            margin-top: 10px; font-family: monospace;
+        .calc-result-box {
+            background: var(--p); color: white; padding: 15px;
+            border-radius: 12px; text-align: center; margin-top: 15px;
         }
+        .calc-final { font-size: 1.6rem; font-weight: 800; font-family: monospace; letter-spacing: 1px; }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* --- SEARCH & ACCORDION --- */
+        .search-bar {
+            width: 100%; padding: 15px; border: 2px solid #e9ecef;
+            border-radius: 12px; font-size: 1rem; box-sizing: border-box;
+            margin-bottom: 20px; outline: none; transition: 0.3s;
         }
+        .search-bar:focus { border-color: var(--p); }
+        .accordion-item { border-bottom: 1px solid #eee; }
+        .accordion-header {
+            padding: 15px 0; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center;
+            font-weight: 600; color: #333;
+        }
+        .accordion-body { display: none; padding-bottom: 15px; font-size: 0.95rem; color: #555; line-height: 1.6; }
+        .brand-tag {
+            display: inline-block; background: #333; color: #fff;
+            font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-bottom: 8px;
+        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <div class="nav-pill-container">
-            <div class="nav-pill active" onclick="setTab('pocket')">Pocket Mode</div>
-            <div class="nav-pill" onclick="setTab('pitch')">The Pitch</div>
-            <div class="nav-pill" onclick="setTab('specs')">Data</div>
+            <div class="nav-pill active" onclick="switchTab('pocket', this)">Pocket Mode</div>
+            <div class="nav-pill" onclick="switchTab('pitch', this)">The Pitch</div>
+            <div class="nav-pill" onclick="switchTab('specs', this)">Tech Data</div>
         </div>
     </div>
 
-    <div id="pocket" class="content">
+    <div id="pocket" class="content active">
         
         <div class="card">
-            <h3>The Vibe Check</h3>
-            <p style="color:#666; font-size:0.9rem;">Establish the ground rules before you measure.</p>
+            <h3>Intention Tracker</h3>
+            <p>Use these "Assumptive Cues" while measuring to test if they are mentally buying. If they push back, they aren't sold yet.</p>
             
-            <div class="prompt-box">
-                <span class="prompt-label">Ask The Client:</span>
-                <span class="prompt-text">"Before I pull out the laser... Are we measuring to buy today, or are we just 'kicking tyres'?"</span>
+            <div class="checklist-item" onclick="toggleCheck(this)">
+                <div class="check-circle"></div>
+                <div>
+                    <span class="cue-title">CUE 1: The Visual Link</span>
+                    <span class="cue-desc">"This fabric tone pulls nicely from the [Sofa/Rug]..."</span>
+                </div>
             </div>
-
-            <div class="btn-grid">
-                <button class="btn primary" onclick="showResponse('vibe_real')">
-                    They said: "We're Serious"
-                    <span class="sub-text"> Proceed to Measure.</span>
-                </button>
-                <button class="btn" onclick="showResponse('vibe_tyre')">
-                    They said: "Just Looking"
-                    <span class="sub-text">Switch to 'Speed Quote' mode.</span>
-                </button>
+            
+            <div class="checklist-item" onclick="toggleCheck(this)">
+                <div class="check-circle"></div>
+                <div>
+                    <span class="cue-title">CUE 2: The Problem Solver</span>
+                    <span class="cue-desc">"Once these are in, that [Glare/Heat] won't be an issue anymore..."</span>
+                </div>
             </div>
-            <div id="vibe_resp" style="margin-top:15px; font-weight:bold; color:var(--p);"></div>
+            
+            <div class="checklist-item" onclick="toggleCheck(this)">
+                <div class="check-circle"></div>
+                <div>
+                    <span class="cue-title">CUE 3: The Configuration</span>
+                    <span class="cue-desc">"I'll note this as a [Left/Right] control so it hides behind the curtain..."</span>
+                </div>
+            </div>
+            
+            <div style="margin-top:15px; font-size:0.8rem; color:#666; border-top:1px solid #eee; padding-top:10px;">
+                <b>The Test:</b> A "Yes" means they are visualizing the finish. A "Maybe" means they are still deciding.
+            </div>
         </div>
 
         <div class="card">
             <h3>Plan Decoder</h3>
             <div class="calc-row">
-                <input type="number" id="wInput" class="calc-input" placeholder="Width" oninput="calcDims()">
-                <select id="wUnit" class="calc-select" onchange="calcDims()"><option value="mm">mm</option><option value="c">Crse</option></select>
+                <div class="calc-label-side">Width</div>
+                <input type="number" id="wInput" class="calc-input" placeholder="0" oninput="calcDims()">
+                <select id="wUnit" class="calc-select" onchange="calcDims()">
+                    <option value="mm">mm</option>
+                    <option value="c">Courses</option>
+                </select>
             </div>
             <div class="calc-row">
-                <input type="number" id="hInput" class="calc-input" placeholder="Height" oninput="calcDims()">
-                <select id="hUnit" class="calc-select" onchange="calcDims()"><option value="c">Crse</option><option value="mm">mm</option></select>
+                <div class="calc-label-side">Drop</div>
+                <input type="number" id="hInput" class="calc-input" placeholder="0" oninput="calcDims()">
+                <select id="hUnit" class="calc-select" onchange="calcDims()">
+                    <option value="c">Courses</option>
+                    <option value="mm">mm</option>
+                </select>
             </div>
-            <div id="finalDim" class="calc-result">- x -</div>
+            <div class="calc-result-box">
+                <div style="font-size:0.7rem; opacity:0.8; text-transform:uppercase;">Mfg Dimensions (mm)</div>
+                <div id="finalDim" class="calc-final">- x -</div>
+            </div>
         </div>
     </div>
 
-    <div id="pitch" class="content hidden">
+    <div id="pitch" class="content">
         
-        <div id="step1" class="card">
-            <h3>Step 1: The Reveal</h3>
-            <p>Present the full retail price. Do NOT discount yet.</p>
+        <div id="stage0" class="card">
+            <h3>Step 1: The Value Stack</h3>
+            <p>Confirm the <b>Tailored Package</b> before price. Make them say YES to the quality.</p>
+            
+            <div class="checklist-item" id="stack1" onclick="toggleStack(this)">
+                <div class="check-circle"></div>
+                <div>
+                    <span class="cue-title">The Durability</span>
+                    <span class="cue-desc">"We chose the Lumiere Core so it won't warp, right?"</span>
+                </div>
+            </div>
+            <div class="checklist-item" id="stack2" onclick="toggleStack(this)">
+                <div class="check-circle"></div>
+                <div>
+                    <span class="cue-title">The Hardware</span>
+                    <span class="cue-desc">"You wanted the smooth Acmeda winder?"</span>
+                </div>
+            </div>
+            <div class="checklist-item" id="stack3" onclick="toggleStack(this)">
+                <div class="check-circle"></div>
+                <div>
+                    <span class="cue-title">The Outcome</span>
+                    <span class="cue-desc">"You love how this finish suits the room?"</span>
+                </div>
+            </div>
+
+            <button id="revealBtn" class="btn primary hidden" style="margin-top:15px;" onclick="setPitchStage('stage1')">
+                They Agreed. Reveal Price.
+            </button>
+        </div>
+
+        <div id="stage1" class="card hidden">
+            <h3>Step 2: The Price Reveal</h3>
             <div class="prompt-box">
                 <span class="prompt-label">The Script:</span>
-                <span class="prompt-text">"Based on the measurements, the total investment for the premium finish is..."</span>
+                <span class="prompt-text">"Based on that perfect package we just built, the total investment for the 'Gold Standard' finish is..."</span>
             </div>
             <div class="btn-grid">
-                <button class="btn" onclick="nextStep('step2_ouch')">Client Winces / Says "Ouch"</button>
-                <button class="btn" onclick="nextStep('step2_silent')">Client is Silent (Poker Face)</button>
-                <button class="btn danger" onclick="nextStep('step2_impossible')">Client Laughs / Says "No Way"</button>
+                <button class="btn safe" onclick="setPitchStage('stage_win')">Client is Happy (Sign)</button>
+                <button class="btn" onclick="setPitchStage('stage_calib')">Client says: "Ouch" (Wince)</button>
+                <button class="btn danger" onclick="setPitchStage('stage_stall')">Client says: "Not Ready"</button>
             </div>
         </div>
 
-        <div id="step2_ouch" class="card hidden">
-            <h3>Step 2: The Hesitation</h3>
-            <p>They want it, but the price hurts. Time for the "If I... Will You?"</p>
+        <div id="stage_calib" class="card hidden">
+            <h3>Calibration Mode</h3>
+            <div class="prompt-box">
+                <span class="prompt-label">The Script:</span>
+                <span class="prompt-text">"Okay, we have two levers. We can adjust the <b>Product Specs</b> (Descope) or we can look at the <b>Price/Payment</b>."</span>
+            </div>
+            <div class="btn-grid">
+                <button class="btn" onclick="setPitchStage('stage_descope')">Adjust Product (Descope)</button>
+                <button class="btn primary" onclick="setPitchStage('stage_deal')">Deal Maker (Price)</button>
+            </div>
+            <button style="margin-top:20px; border:none; background:none; color:#999; width:100%;" onclick="resetPitch()">Reset Pitch</button>
+        </div>
+
+        <div id="stage_stall" class="card hidden" style="border-top-color:var(--warn);">
+            <h3>The Schedule Reality</h3>
+            <p>They said "Not Ready" or "Just Looking". Pivot to <b>Lead Times</b>.</p>
             
             <div class="prompt-box">
-                <span class="prompt-label">Ask The Client:</span>
-                <span class="prompt-text">"I can see you hesitating. If I could sharpen this pencil to meet your target, would you be happy to sign the paperwork right now?"</span>
+                <span class="prompt-label">The Script:</span>
+                <span class="prompt-text">"I understand. But my main concern is your <b>schedule</b>. <br><br>Lead times are <b>8 Weeks</b>. If we don't finalize this week, you won't have privacy until [Insert Month]. Is it worth risking that delay?"</span>
             </div>
 
             <div class="btn-grid">
-                <button class="btn primary" onclick="nextStep('step3_deal')">
-                    They said: "YES"
-                    <span class="sub-text">Commitment locked. Call Manager.</span>
-                </button>
-                <button class="btn" onclick="nextStep('step3_stall')">
-                    They said: "MAYBE"
-                    <span class="sub-text">"I still need to think about it..."</span>
-                </button>
+                <button class="btn safe" onclick="setPitchStage('stage_win')">"I didn't realize that." (Sign)</button>
+                <button class="btn" onclick="setPitchStage('stage_hailmary')">"We can wait." (Hail Mary)</button>
             </div>
-            <button style="margin-top:15px; border:none; background:none; color:#888;" onclick="resetPitch()">Start Over</button>
         </div>
 
-        <div id="step2_impossible" class="card hidden">
-            <h3>Step 2: The Reality Check</h3>
-            <p>The gap is too big for a discount. We need to Descope.</p>
-            
+        <div id="stage_deal" class="card hidden" style="border-top-color:var(--safe);">
+            <h3>Deal Maker</h3>
             <div class="prompt-box">
-                <span class="prompt-label">Ask The Client:</span>
-                <span class="prompt-text">"Okay, I've clearly over-specced this. To fit the budget, should we change the Fabric or remove the Motorisation?"</span>
+                <span class="prompt-label">The "If I, Will You?" Close:</span>
+                <span class="prompt-text">"If I can sharpen the pencil to meet your target, would you be happy to sign the paperwork right now?"</span>
             </div>
-
             <div class="btn-grid">
-                <button class="btn" onclick="resetPitch()">Recalculate Quote</button>
-                <button class="btn danger" onclick="nextStep('step3_exit')">They won't budge (Exit)</button>
+                <button class="btn safe" onclick="setPitchStage('stage_win')">YES (Call Manager)</button>
+                <button class="btn" onclick="setPitchStage('stage_stall')">MAYBE (Go to Stall)</button>
             </div>
         </div>
 
-        <div id="step3_stall" class="card hidden">
-            <h3>The Stall Detector</h3>
-            <p>They wouldn't commit. What is the excuse?</p>
-            <div class="btn-grid">
-                <button class="btn" onclick="showObjection('partner')">"Need to ask Partner"</button>
-                <button class="btn" onclick="showObjection('think')">"Need to Think about it"</button>
-                <button class="btn" onclick="showObjection('shop')">"Getting other Quotes"</button>
-            </div>
-            
-            <div id="obj_response" class="prompt-box hidden" style="background:#fff3cd; border-color:#ffc107;">
-                <span class="prompt-label">The Response:</span>
-                <span id="obj_text" class="prompt-text"></span>
-            </div>
-            <button style="margin-top:15px; border:none; background:none; color:#888;" onclick="resetPitch()">Start Over</button>
-        </div>
-
-        <div id="step3_deal" class="card hidden" style="border-top-color: var(--safe);">
-            <h3>🎉 Green Light</h3>
-            <p>They committed. You are safe to discount.</p>
+        <div id="stage_hailmary" class="card hidden">
+            <h3>The Hail Mary</h3>
             <div class="prompt-box">
-                <span class="prompt-label">Action:</span>
-                <span class="prompt-text">"Fantastic. Let me call my manager to get approval for that number. Get the paperwork ready."</span>
+                <span class="prompt-label">The Script:</span>
+                <span class="prompt-text">"Fair enough. But before I pack up—is there <b>anything</b> I could do or say that would win your business today?"</span>
             </div>
+            <button class="btn" onclick="resetPitch()">Restart</button>
+        </div>
+
+        <div id="stage_descope" class="card hidden" style="border-top-color:var(--warn);">
+            <h3>Product Descope</h3>
+            <p>Reduce the spec to hit the budget.</p>
+            <ul style="text-align:left; color:#555; margin-bottom:20px;">
+                <li>Remove Motorisation?</li>
+                <li>Change Uniline (10yr) to Shaw (5yr)?</li>
+                <li>Remove Z-Frame?</li>
+            </ul>
+            <button class="btn" onclick="resetPitch()">Recalculate Price</button>
+        </div>
+
+        <div id="stage_win" class="card hidden" style="border-top-color:var(--safe); text-align:center;">
+            <h1 style="font-size:3rem; margin:10px 0;">🎉</h1>
+            <h3>Green Light</h3>
+            <p>Proceed to paperwork.</p>
             <button class="btn primary" onclick="resetPitch()">New Client</button>
         </div>
     </div>
 
-    <div id="specs" class="content hidden">
-        <div class="card">
-            <h3>Cheat Guide</h3>
-            <input type="text" id="dbSearch" placeholder="Search specs..." style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; box-sizing:border-box;" onkeyup="filterDB()">
-            <div id="dbList" style="text-align:left; margin-top:15px;">
-                </div>
-        </div>
+    <div id="specs" class="content">
+        <input type="text" id="techSearch" class="search-bar" placeholder="Search (e.g. 'acmeda', 'recess', 'lumiere')..." onkeyup="filterTech()">
+        <div id="techList"></div>
     </div>
 
 <script>
-    // --- NAVIGATION ---
-    function setTab(id) {
-        document.querySelectorAll('.content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-
-    // --- POCKET MODE LOGIC ---
-    function showResponse(type) {
-        const div = document.getElementById('vibe_resp');
-        if(type === 'vibe_real') div.innerText = "Excellent. Get the Laser.";
-        if(type === 'vibe_tyre') div.innerText = "Action: Measure 1 window only as a 'Sample Quote'.";
+    /* --- LOGIC: POCKET MODE --- */
+    function toggleCheck(el) {
+        el.classList.toggle('checked');
     }
 
     function calcDims() {
@@ -322,52 +428,76 @@
         document.getElementById('finalDim').innerText = `${finalW} x ${finalH}`;
     }
 
-    // --- PITCH MODE LOGIC ---
-    function nextStep(id) {
+    /* --- LOGIC: PITCH MODE --- */
+    let stackCount = 0;
+    function toggleStack(el) {
+        if(!el.classList.contains('checked')) {
+            el.classList.add('checked');
+            stackCount++;
+        } else {
+            el.classList.remove('checked');
+            stackCount--;
+        }
+        
+        // Only show reveal button if 3 yeses
+        if(stackCount >= 3) {
+            document.getElementById('revealBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('revealBtn').classList.add('hidden');
+        }
+    }
+
+    function setPitchStage(stageId) {
         document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
+        document.getElementById(stageId).classList.remove('hidden');
     }
 
     function resetPitch() {
         document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden'));
-        document.getElementById('step1').classList.remove('hidden');
-        document.getElementById('obj_response').classList.add('hidden');
+        document.getElementById('stage0').classList.remove('hidden');
+        document.querySelectorAll('.checklist-item').forEach(el => el.classList.remove('checked'));
+        document.getElementById('revealBtn').classList.add('hidden');
+        stackCount = 0;
     }
 
-    function showObjection(type) {
-        const box = document.getElementById('obj_response');
-        const txt = document.getElementById('obj_text');
-        box.classList.remove('hidden');
-
-        if(type === 'partner') {
-            txt.innerText = "⚠️ Truth Check: \"Is this a polite 'No'? If they were here right now, would we be signing? Let's FaceTime them.\"";
-        } else if (type === 'think') {
-            txt.innerText = "⚠️ Reality Check: \"Usually 'Thinking' means 'Googling Cheaper Stuff'. What is the ONE worry stopping you?\"";
-        } else if (type === 'shop') {
-            txt.innerText = "⚠️ Value Check: \"Smart. But if you don't have my final price, you have nothing to compare them to. Let me be the benchmark.\"";
-        }
-    }
-
-    // --- DATA LOGIC ---
-    const dbData = [
-        {k:"Brick Course", v:"89mm"},
-        {k:"Roller Recess", v:"60mm"},
-        {k:"S-Fold Stack", v:"~30% Width"},
-        {k:"Shutter Blade", v:"63/89/114mm"},
-        {k:"Door Height", v:"2040mm Std"}
+    /* --- LOGIC: TECH DATA --- */
+    const techData = [
+        {cat: "Roller Blinds", brand: "Acmeda", title: "Acmeda Hardware Specs", body: "Standard hardware is **Rollease Acmeda**. <br>• Chain winder: RB09 (Smooth). <br>• Tube: 45mm Heavy Duty. <br>• Light Gaps: 15mm (Chain side) / 10mm (Idle side)."},
+        {cat: "Roller Blinds", brand: "Acmeda", title: "Recess Depths (Rollers)", body: "Minimum reveal depth for Flush Mount:<br>• **Single Roller:** 60mm.<br>• **Double Roller:** 135mm.<br>• **Projection:** Single 68mm / Double 145mm."},
+        {cat: "Fabrics", brand: "Uniline / Shaw", title: "Fabric Warranty Tiers", body: "Know your warranty:<br>• **Uniline (Dawn/Uniview):** 10 Year Warranty (Premium).<br>• **Shaw / Wilson:** 5 Year Warranty (Standard)."},
+        {cat: "Shutters", brand: "Lumiere", title: "Lumiere Shutter Specs", body: "Product Name: **Lumiere**.<br>• Core: **Aluminium Reinforced** (Won't warp).<br>• Blade Sizes: 63mm / 89mm (Std) / 114mm.<br>• Max Panel: 750mm (PVC)."},
+        {cat: "Shutters", brand: "Lumiere", title: "Shutter Framing", body: "• **Z-Frame:** Use for out-of-square windows.<br>• **L-Frame:** Inside mount.<br>• **U-Channel:** Fixed panels."},
+        {cat: "Zipscreen", brand: "Acmeda", title: "Zipscreen Dimensions", body: "• **Headbox:** 110mm (Std) / 130mm (Large).<br>• **Side Channels:** 30mm width.<br>• **Wind:** Rated to ~60km/h."},
+        {cat: "Curtains", brand: "Decor", title: "Curtain Stacking", body: "• **S-Fold/Wave:** Stacks to ~30% of width.<br>• **Pinch Pleat:** Stacks to ~25% of width."},
+        {cat: "General", brand: "General", title: "Brick Course Conversion", body: "Standard Vertical Brick Course = **89mm** (including mortar)."}
     ];
-    
-    const list = document.getElementById('dbList');
-    dbData.forEach(d => {
-        list.innerHTML += `<div class="db-item" style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"><b>${d.k}</b><span style="font-family:monospace; color:var(--p);">${d.v}</span></div>`;
+
+    const listContainer = document.getElementById('techList');
+    techData.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'accordion-item';
+        div.innerHTML = `<div class="accordion-header" onclick="toggleAcc(this)"><span>${item.title}</span></div><div class="accordion-body"><span class="brand-tag">${item.brand}</span> <span class="brand-tag" style="background:#eee; color:#555;">${item.cat}</span><p>${item.body}</p></div>`;
+        listContainer.appendChild(div);
     });
 
-    function filterDB() {
-        const term = document.getElementById('dbSearch').value.toLowerCase();
-        const items = document.querySelectorAll('.db-item');
-        items.forEach(i => {
-            i.style.display = i.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+    function filterTech() {
+        const input = document.getElementById('techSearch').value.toLowerCase();
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            item.classList.toggle('hidden', !item.innerText.toLowerCase().includes(input));
         });
+    }
+
+    function toggleAcc(header) {
+        header.classList.toggle('active');
+        const body = header.nextElementSibling;
+        body.style.display = body.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function switchTab(id, btn) {
+        document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
     }
 </script>
 
