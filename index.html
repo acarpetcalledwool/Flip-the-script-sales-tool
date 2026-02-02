@@ -99,7 +99,7 @@
         /* --- UI ELEMENTS --- */
         .checklist-item {
             background: #f8f9fa; border: 2px solid #eee; border-radius: 12px;
-            padding: 16px; margin-bottom: 12px; display: flex; align-items: center;
+            padding: 18px; margin-bottom: 12px; display: flex; align-items: center;
             cursor: pointer; transition: 0.2s;
         }
         .checklist-item.active { background: #fff; border-color: var(--safe); box-shadow: 0 4px 15px rgba(39,174,96,0.15); }
@@ -117,7 +117,16 @@
             cursor: pointer; transition: 0.2s; text-align: center;
         }
         .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--p); color: white; box-shadow: 0 4px 15px rgba(0,74,153,0.3); }
+        .btn-primary { 
+            background: var(--p); color: white; box-shadow: 0 4px 15px rgba(0,74,153,0.3);
+            animation: pulse 2s infinite; /* Dopamine Trigger */
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 74, 153, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 74, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 74, 153, 0); }
+        }
+
         .btn-safe { background: var(--safe); color: white; box-shadow: 0 4px 15px rgba(39,174,96,0.3); }
         .btn-danger { background: #fff5f5; color: var(--danger); border: 2px solid #ffcdd2; }
         .btn-outline { background: white; border: 2px solid #eee; color: #7f8c8d; }
@@ -145,8 +154,28 @@
             color: var(--p); font-weight: 800; font-size: 0.9rem; text-transform: uppercase;
             background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #bbdefb;
         }
-        .rep-prompt.urgent {
-             color: #c0392b; background: #fff5f5; border-color: #ffcdd2;
+        .rep-prompt.urgent { color: #c0392b; background: #fff5f5; border-color: #ffcdd2; }
+
+        /* --- DRUMROLL ANIMATION --- */
+        #drumrollOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95); z-index: 200;
+            display: none; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .drum-icon { font-size: 4rem; animation: shake 0.1s infinite; }
+        .drum-text { margin-top: 20px; font-size: 1.5rem; color: var(--p); font-weight: 800; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
 
         /* --- POCKET MODE --- */
@@ -168,6 +197,11 @@
     </style>
 </head>
 <body>
+
+<div id="drumrollOverlay">
+    <div class="drum-icon">🎁</div>
+    <div class="drum-text">Calculating Best Value...</div>
+</div>
 
 <div class="header">
     <div class="nav-pill-container">
@@ -216,23 +250,23 @@
 
     <div id="step_value" class="card">
         <h2>1. Package Verification</h2>
-        <p>Confirm the <b>Tailored Specification</b> before we proceed.</p>
+        <p>Before we view the investment, let's confirm this solves the problem.</p>
         
         <div class="checklist-item" onclick="toggleCheck(this)">
             <div class="check-circle"></div>
-            <div><b>Lumiere Core</b> (Reinforced)</div>
+            <div><b>Design & Happiness</b><br><span style="font-size:0.9rem; color:#666;">We are excited about the look & fabric?</span></div>
         </div>
         <div class="checklist-item" onclick="toggleCheck(this)">
             <div class="check-circle"></div>
-            <div><b>Acmeda Hardware</b> (Smooth Op)</div>
+            <div><b>Lead Time Suitability</b><br><span style="font-size:0.9rem; color:#666;">The production timeline works for you?</span></div>
         </div>
         <div class="checklist-item" onclick="toggleCheck(this)">
             <div class="check-circle"></div>
-            <div><b>Custom Finish</b> (Colour Matched)</div>
+            <div><b>Scope & Inclusions</b><br><span style="font-size:0.9rem; color:#666;">We have covered every window correctly?</span></div>
         </div>
 
-        <button id="revealBtn" class="btn btn-primary btn-full hidden" onclick="nextStep('step_reveal')">
-            Package Confirmed. Reveal Price.
+        <button id="revealBtn" class="btn btn-primary btn-full hidden" onclick="playDrumroll()">
+            Everything Correct. Reveal Investment.
         </button>
     </div>
 
@@ -246,25 +280,39 @@
             <div style="font-size:1.5rem; font-weight:700; color:#2c3e50;">[ STATE PRICE ]</div>
         </div>
 
-        <div class="btn-full">
-            <button class="btn btn-safe" style="width:100%; font-size:1.2rem; padding:20px;" onclick="nextStep('step_win')">Proceed to Paperwork</button>
+        <div class="btn-grid">
+            <button class="btn btn-safe" onclick="nextStep('step_win')">Happy / Let's Go</button>
+            <button class="btn btn-danger" onclick="nextStep('step_discount5')">Too Expensive</button>
         </div>
-        
-        <div style="text-align:center; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
-            <p style="margin-bottom:10px; font-size:0.9rem;">Need to adjust details?</p>
-            <button class="btn btn-outline" style="width:100%;" onclick="nextStep('step_crossroads')">Review Project & Budget</button>
+        <div class="btn-full" style="margin-top:15px;">
+             <button class="btn btn-outline" onclick="nextStep('step_crossroads')">Something Else...</button>
         </div>
     </div>
 
     <div id="step_crossroads" class="card hidden">
         <h2>3. Project Review</h2>
-        <p>Which factor is preventing us from moving forward?</p>
+        <p>What is holding us back?</p>
         
         <div class="objection-grid">
-            <div class="obj-btn" onclick="enterMaze('step_align')">💰 Budget / Value</div>
             <div class="obj-btn" onclick="enterMaze('maze_partner')">👫 Partner / Spouse</div>
             <div class="obj-btn" onclick="enterMaze('maze_shop')">🔍 Product Match</div>
             <div class="obj-btn" onclick="enterMaze('maze_time')">⏳ Timing</div>
+        </div>
+    </div>
+
+    <div id="step_discount5" class="card hidden">
+        <h2 style="color:var(--p);">Strategic Adjustment</h2>
+        
+        <div class="rep-prompt">📢 REP: Offer 5% Discount to seal it now.</div>
+
+        <div class="redirect-box">
+            <span class="redirect-title">Proposal</span>
+            <p style="margin:0;">"I can authorize a <b>5% Manager's Discount</b> right now if we secure the production slot today."</p>
+        </div>
+
+        <div class="btn-grid">
+            <button class="btn btn-safe" onclick="nextStep('step_win')">Client Accepted (Sign)</button>
+            <button class="btn btn-danger" onclick="nextStep('step_align')">Still Too High</button>
         </div>
     </div>
 
@@ -326,7 +374,6 @@
 
     <div id="maze_partner" class="card hidden">
         <h2 style="color:var(--warn);">Joint Decision</h2>
-        <p>Let's not guess their answer. Let's get a decision now.</p>
         
         <div class="redirect-box" style="border-color:var(--warn); background:#fffaf0;">
             <span class="redirect-title">Protocol</span>
@@ -341,14 +388,11 @@
             <button class="btn btn-primary" onclick="nextStep('step_win')">Call & Sign</button>
             <button class="btn btn-outline" onclick="nextStep('step_crossroads')">It's not the Partner</button>
         </div>
-
         <span class="exit-link" onclick="nextStep('step_exit')">Absolute Veto. (Archive Quote)</span>
     </div>
 
     <div id="maze_shop" class="card hidden">
         <h2 style="color:var(--p);">Product Match</h2>
-        <p>Ensure you are comparing "Apples to Apples".</p>
-        
         <div class="redirect-box">
             <span class="redirect-title">Competitor Checklist</span>
             <p>If you shop around, check these 3 things to ensure equal quality:</p>
@@ -361,14 +405,11 @@
             <button class="btn btn-safe" onclick="nextStep('step_win')">Stick with Quality</button>
             <button class="btn btn-outline" onclick="nextStep('step_crossroads')">Review Budget Instead</button>
         </div>
-
         <span class="exit-link" onclick="nextStep('step_exit')">Don't have what I want. (Archive Quote)</span>
     </div>
 
     <div id="maze_time" class="card hidden">
         <h2 style="color:var(--warn);">Schedule Risk</h2>
-        <p>The issue isn't the order. It's the <b>Logistics</b>.</p>
-
         <div class="redirect-box" style="border-color:var(--warn); background:#fffaf0;">
             <span class="redirect-title">Production Reality</span>
             <div style="font-size:1.2rem; font-weight:800; color:var(--warn); margin:10px 0;">Lead Time: 8 Weeks</div>
@@ -418,7 +459,6 @@
         document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
         document.getElementById('nav-' + id).classList.add('active');
 
-        // Lock-in Logic
         if(id === 'pitch') {
             document.getElementById('nav-pocket').classList.add('vanished');
         }
@@ -434,6 +474,18 @@
         } else {
             document.getElementById('revealBtn').classList.add('hidden');
         }
+    }
+
+    function playDrumroll() {
+        // Show Overlay
+        const drum = document.getElementById('drumrollOverlay');
+        drum.style.display = 'flex';
+        
+        // Wait 1.5s then show price
+        setTimeout(() => {
+            drum.style.display = 'none';
+            nextStep('step_reveal');
+        }, 1500);
     }
 
     function nextStep(id) {
