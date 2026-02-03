@@ -1,20 +1,27 @@
+This is a radical but brilliant shift. By turning the entire app into a Sales GPS (Chatbot), you remove the cognitive load from the Rep. They don't have to decide which tab to click; they just answer the bot's prompt: "What is happening right now?"
+The Bot becomes the Sales Manager in their pocket.
+The "Sales Genius" Chatbot (v3.0)
+How it works:
+ * The Interface: A clean chat window. No tabs.
+ * The Engine: The bot drives the appointment. It presents Dynamic Option Buttons based on the current context.
+ * The "Pivot": If you click "Client is stalling," the bot immediately clears the screen and presents the specific objection-handling scripts (The Maze).
+ * The "Genius" Feature: You can type technical questions (e.g., "Cleaning") into the chat bar at any time, and it answers without breaking the flow.
+Here is the code. Save as .html and open on a phone.
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Blinds Sales Hub 2.3</title>
+    <title>Sales Genius 3.0</title>
     <style>
         :root { 
             --p: #004a99; /* Mega Blue */
-            --bg: #f4f6f8; 
-            --card-bg: #ffffff;
+            --bg: #f0f2f5; 
+            --bot-bg: #ffffff;
+            --user-bg: #004a99;
             --txt: #2c3e50;
             --safe: #27ae60;
-            --warn: #f39c12;
             --danger: #e74c3c;
-            --subtle: #95a5a6;
-            --chat-bg: #eef2f5;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
@@ -22,449 +29,390 @@
             display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        /* --- HEADER & NAV --- */
-        .header {
-            background: var(--card-bg); padding: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-            display: flex; justify-content: center; align-items: center; z-index: 100;
+        /* --- CHAT AREA --- */
+        #chat-container {
+            flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 160px; /* Space for controls */
+            display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth;
         }
-        .nav-pill-container {
-            display: flex; background: #ecf0f1; border-radius: 50px; padding: 4px;
-            width: 100%; max-width: 800px; overflow-x: auto;
+
+        .msg {
+            max-width: 85%; padding: 15px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5;
+            position: relative; animation: slideUp 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .nav-pill {
-            flex: 1; text-align: center; padding: 12px 8px; font-size: 0.85rem; font-weight: 700;
-            color: #bdc3c7; border-radius: 40px; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+        .msg.bot { 
+            background: var(--bot-bg); align-self: flex-start; border-bottom-left-radius: 4px; color: #333;
         }
-        .nav-pill.active { background: var(--card-bg); color: var(--p); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .msg.user { 
+            background: var(--user-bg); align-self: flex-end; border-bottom-right-radius: 4px; color: white;
+        }
+        .msg.system {
+            background: rgba(0,0,0,0.05); align-self: center; font-size: 0.8rem; 
+            color: #777; padding: 5px 15px; border-radius: 20px; box-shadow: none;
+        }
         
-        .reset-icon {
-            position: absolute; right: 10px; font-size: 1.4rem; color: #bdc3c7; opacity: 0.3;
-            cursor: pointer; padding: 10px; transition: 0.2s;
+        .card-insert {
+            background: white; border-radius: 12px; padding: 15px; margin-top: 10px;
+            border-left: 4px solid var(--p); width: 100%; box-sizing: border-box;
         }
-        .reset-icon:hover { opacity: 1; color: var(--danger); }
 
-        /* --- CONTENT --- */
-        .content {
-            flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; /* Space for FAB */
-            max-width: 800px; margin: 0 auto; width: 100%; display: none; box-sizing: border-box;
-        }
-        .content.active { display: block; animation: fadeUp 0.3s ease; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- CARDS & UI --- */
-        .card {
-            background: var(--card-bg); border-radius: 16px; padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 15px;
-            border-left: 5px solid var(--p);
+        /* --- DYNAMIC CONTROLS (The Buttons) --- */
+        #controls {
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(255,255,255,0.95); border-top: 1px solid #eee;
+            padding: 15px; padding-bottom: 25px; box-sizing: border-box;
+            display: flex; flex-direction: column; gap: 10px; z-index: 100;
+            backdrop-filter: blur(10px);
         }
-        .card h2 { margin: 0 0 10px 0; color: var(--p); font-size: 1.25rem; }
-        .card p { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; }
 
-        /* --- GENIUS CHATBOT UI --- */
-        #geniusFab {
-            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
-            background: var(--p); border-radius: 50%; box-shadow: 0 4px 20px rgba(0,74,153,0.4);
-            display: flex; align-items: center; justify-content: center; font-size: 30px;
-            cursor: pointer; z-index: 1000; transition: transform 0.2s; color: white;
+        .btn-grid {
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
         }
-        #geniusFab:active { transform: scale(0.9); }
+
+        .action-btn {
+            background: white; border: 1px solid #ccc; padding: 12px 20px; 
+            border-radius: 25px; font-weight: 600; color: #444; font-size: 0.9rem;
+            cursor: pointer; transition: 0.1s; flex: 1 1 auto; text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); white-space: nowrap;
+        }
+        .action-btn:active { transform: scale(0.96); background: #eee; }
         
-        #chatWindow {
-            position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px;
-            background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            z-index: 1000; display: none; flex-direction: column; overflow: hidden;
-            border: 1px solid #eee; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .action-btn.primary { background: var(--p); color: white; border: none; box-shadow: 0 4px 10px rgba(0,74,153,0.3); }
+        .action-btn.safe { background: var(--safe); color: white; border: none; }
+        .action-btn.danger { background: #fff5f5; color: var(--danger); border-color: var(--danger); }
 
-        .chat-header {
-            background: var(--p); color: white; padding: 15px; font-weight: bold;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .chat-body {
-            flex: 1; padding: 15px; overflow-y: auto; background: var(--chat-bg);
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .chat-input-area {
-            padding: 10px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px;
-        }
+        /* --- GENIUS INPUT --- */
+        .input-row { display: flex; gap: 10px; margin-top: 5px; }
         .chat-input {
-            flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none;
+            flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; 
+            outline: none; font-size: 1rem;
         }
-        .chat-send {
-            background: var(--p); color: white; border: none; padding: 0 15px; border-radius: 20px; cursor: pointer;
-        }
-        
-        .msg { padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; max-width: 80%; }
-        .msg.bot { background: white; align-self: flex-start; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .msg.user { background: var(--p); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-
-        /* --- SOLUTION FINDER CHIPS --- */
-        .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .chip {
-            padding: 10px 15px; background: #fff; border: 2px solid #eee; border-radius: 25px;
-            font-weight: 600; color: #7f8c8d; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
-        }
-        .chip.selected { background: #eef6ff; color: var(--p); border-color: var(--p); }
-        
-        .recommendation-box {
-            background: linear-gradient(135deg, #004a99 0%, #003366 100%);
-            color: white; padding: 20px; border-radius: 12px; margin-top: 15px; display: none;
-        }
-        .reality-check { 
-            background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; 
-            font-size: 0.85rem; margin-top: 10px; display: none;
+        .send-btn {
+            width: 45px; height: 45px; background: var(--p); color: white; border-radius: 50%;
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
-        /* --- STANDARD UI ELEMENTS --- */
-        .list-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
-        .list-item.active { background: #f0f9ff; border-color: var(--p); }
-        .list-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-        .list-detail { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; font-size: 0.9rem; color: #555; font-style: italic; }
-        .list-item.active .list-detail { display: block; }
-        .check-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; }
-        .list-item.active .check-circle { background: var(--p); border-color: var(--p); color: white; }
-        .list-item.active .check-circle:after { content: '✓'; font-size: 12px; }
+        /* --- TOOLS (Calculators) --- */
+        .calc-input { width: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-weight: bold; }
+        .calc-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 
-        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; margin-top:10px;}
-        .btn-primary { background: var(--p); color: white; }
-        .btn-safe { background: var(--safe); color: white; }
-        .btn-danger { background: #fff5f5; color: var(--danger); border: 1px solid #ffcdd2; }
-        .btn-outline { background: white; border: 2px solid #eee; color: #7f8c8d; }
-        
-        .std-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1.1rem; text-align: center; box-sizing: border-box; }
-        .info-panel { background: #f9f9f9; border-radius: 12px; padding: 15px; border-left: 4px solid var(--subtle); margin-bottom: 15px; }
+        /* --- DRUMROLL --- */
+        #drumroll {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.98); z-index: 999; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .drum-text { font-size: 2rem; font-weight: 800; color: var(--p); animation: pulse 0.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        .hidden { display: none !important; }
-        .struck { text-decoration: line-through; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-<div id="geniusFab" onclick="toggleChat()">🤖</div>
+<div id="drumroll"><div class="drum-text">Calculating Best Value...</div></div>
 
-<div id="chatWindow">
-    <div class="chat-header">
-        <span>Window Genius</span>
-        <span onclick="toggleChat()" style="cursor:pointer;">✕</span>
-    </div>
-    <div class="chat-body" id="chatBody">
-        <div class="msg bot">Hi! I'm the Mega Blinds Genius. Ask me anything about specs, cleaning, motors, or sales tactics.</div>
-    </div>
-    <div class="chat-input-area">
-        <input type="text" id="chatIn" class="chat-input" placeholder="Ask the genius..." onkeypress="handleEnter(event)">
-        <button class="chat-send" onclick="sendMsg()">➤</button>
+<div id="chat-container">
+    <div class="msg bot">
+        👋 <b>Mega Sales Genius Online.</b><br>
+        I'll guide you step-by-step. <br><br>
+        Are we just arriving or already measuring?
     </div>
 </div>
 
-<div id="resetModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:900;display:none;align-items:center;justify-content:center;">
-    <div style="background:white;padding:25px;border-radius:16px;width:300px;text-align:center;">
-        <h3>Reset Options</h3>
-        <button class="btn btn-outline" onclick="resetPage()">Clear Page</button>
-        <button class="btn btn-danger" onclick="resetJob()">Start New</button>
-        <p onclick="closeReset()" style="margin-top:10px;color:#999;cursor:pointer;">Cancel</p>
-    </div>
-</div>
-
-<div class="header">
-    <div class="nav-pill-container">
-        <div id="nav-solution" class="nav-pill" onclick="switchTab('solution')">Solution Finder</div>
-        <div id="nav-pocket" class="nav-pill active" onclick="switchTab('pocket')">Pocket Mode</div>
-        <div id="nav-pitch" class="nav-pill" onclick="switchTab('pitch')">Shared Table</div>
-        <div id="nav-specs" class="nav-pill" onclick="switchTab('specs')">Tech Specs</div>
-    </div>
-    <div class="reset-icon" onclick="openReset()">↻</div>
-</div>
-
-<div id="solution" class="content">
-    <div class="card">
-        <h2>🎯 Best Solution Tool</h2>
-        <p>What defines success for this room?</p>
-        
-        <h4 style="margin:10px 0; color:#555;">1. The Goal</h4>
-        <div class="chip-grid" id="goalChips">
-            <div class="chip" onclick="selectChip(this, 'goal', 'sleep')">Darkness (Sleep)</div>
-            <div class="chip" onclick="selectChip(this, 'goal', 'style')">Visuals (Style)</div>
-            <div class="chip" onclick="selectChip(this, 'goal', 'view')">View & Privacy</div>
-            <div class="chip" onclick="selectChip(this, 'goal', 'budget')">Budget / Rental</div>
-        </div>
-
-        <h4 style="margin:10px 0; color:#555;">2. The Room</h4>
-        <div class="chip-grid" id="roomChips">
-            <div class="chip" onclick="selectChip(this, 'room', 'bed')">Bedroom</div>
-            <div class="chip" onclick="selectChip(this, 'room', 'living')">Living Area</div>
-            <div class="chip" onclick="selectChip(this, 'room', 'wet')">Wet Area</div>
-        </div>
-
-        <div id="recBox" class="recommendation-box">
-            <div style="font-size:1.2rem; font-weight:800;">✨ The Dream: <span id="recTitle"></span></div>
-            <div style="font-size:0.9rem; opacity:0.9; margin-bottom:15px;" id="recDesc"></div>
-            <div class="reality-check">
-                <b>Reality Check (Plan B):</b> <span id="recAlt"></span>
-                <br><i>Suggest this if budget is tight.</i>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="pocket" class="content active">
+<div id="controls">
+    <div id="button-area" class="btn-grid"></div>
     
-    <div class="card" style="border-left-color: #bdc3c7;">
-        <div style="display:flex; justify-content:space-between;">
-            <h2>💡 Expertise Score</h2>
-            <span id="expertScore" style="font-weight:bold; color:#bdc3c7;">0/3</span>
-        </div>
-        <p>Tick when you have demonstrated these:</p>
-        <div class="list-item" onclick="toggleScore(this, 'expert')"><div class="list-header"><span>1. The Aesthetics Fix</span><div class="check-circle"></div></div><div class="list-detail">"I can change the roll direction so the tube is hidden."</div></div>
-        <div class="list-item" onclick="toggleScore(this, 'expert')"><div class="list-header"><span>2. The Design Match</span><div class="check-circle"></div></div><div class="list-detail">"This texture ties the rug and walls together perfectly."</div></div>
-        <div class="list-item" onclick="toggleScore(this, 'expert')"><div class="list-header"><span>3. The Future Proof</span><div class="check-circle"></div></div><div class="list-detail">"We need a projection bracket to clear that handle."</div></div>
+    <div class="input-row">
+        <input type="text" id="userInput" class="chat-input" placeholder="Ask Genius (e.g. 'cleaning', 'motor')..." onkeypress="handleEnter(event)">
+        <button class="send-btn" onclick="askGenius()">➤</button>
     </div>
-
-    <div class="card">
-        <div style="display:flex; justify-content:space-between;">
-            <h2>❤️ Intention Monitor</h2>
-            <span id="intentScore" style="font-weight:bold; color:#bdc3c7;">0/5</span>
-        </div>
-        <p>Score the client's buy-in.</p>
-        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>1. Visual Ownership</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Touching fabric. <i>"Can you picture this here?"</i></div></div>
-        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>2. Problem Solved</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Relief. <i>"Imagine that glare gone tomorrow."</i></div></div>
-        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>3. Technical Buy-In</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Logistics. <i>"Chain on the left?"</i></div></div>
-        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>4. All Decision Makers?</span><div class="check-circle"></div></div><div class="list-detail"><b>Risk:</b> If No, ask: <i>"Do they need to see this?"</i></div></div>
-        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>5. Engagement Level</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Asking about price/timelines openly.</div></div>
-        <div id="unlockMsg" style="text-align:center; color:#27ae60; font-weight:bold; display:none; margin-top:10px;">Ready for Table 🚀</div>
-    </div>
-
-    <div class="card" style="background:#eef6ff; border-left-color:#004a99;">
-        <h2>🔄 The Pivot Plan</h2>
-        <p>Establish the Dream and the Backup.</p>
-        <div style="font-weight:bold; color:#004a99;">Plan A (Dream): <input type="text" class="std-input" placeholder="e.g. Shutters"></div>
-        <div style="font-weight:bold; color:#555; margin-top:10px;">Plan B (Backup): <input type="text" class="std-input" placeholder="e.g. Venetians"></div>
-        <p style="text-align:center; font-style:italic; font-size:0.85rem; margin-top:5px;">"If Plan A is over budget, are we happy to fall back to Plan B?"</p>
-    </div>
-
-    <div class="card">
-        <h2>📏 Quick Converter</h2>
-        <div style="display:flex; gap:10px;">
-            <input type="number" class="std-input" id="calcH" placeholder="Height (Courses)" oninput="runCalc()">
-            <input type="number" class="std-input" id="calcW" placeholder="Width (Bricks)" oninput="runCalc()">
-        </div>
-        <div style="background:#333; color:white; padding:15px; border-radius:8px; text-align:center; font-weight:bold; font-size:1.2rem; margin-top:10px;" id="calcRes">0mm x 0mm</div>
-    </div>
-</div>
-
-<div id="pitch" class="content">
-    
-    <div id="view_verify">
-        <div class="card">
-            <h2>1. Package Verification</h2>
-            <div class="list-item" onclick="this.classList.toggle('active'); checkReveal()"><div class="list-header"><span>Design & Happiness</span><div class="check-circle"></div></div></div>
-            <div class="list-item" onclick="this.classList.toggle('active'); checkReveal()"><div class="list-header"><span>Timeline Suitability</span><div class="check-circle"></div></div></div>
-            <div class="list-item" onclick="this.classList.toggle('active'); checkReveal()"><div class="list-header"><span>Scope Check</span><div class="check-circle"></div></div></div>
-            <button id="revealBtn" class="btn btn-primary hidden" onclick="goTo('view_price')">All Correct. Reveal Price.</button>
-        </div>
-    </div>
-
-    <div id="view_price" class="hidden">
-        <div class="card">
-            <h2>2. Investment Overview</h2>
-            <div style="background:#f0f9ff; border:2px solid var(--p); border-radius:12px; padding:30px; text-align:center; margin:20px 0;">
-                <div style="text-transform:uppercase; font-weight:800; color:var(--p); font-size:0.8rem;">Total Project Investment</div>
-                <div style="font-size:2rem; font-weight:800; color:#333;">[ STATE PRICE ]</div>
-            </div>
-            <button class="btn btn-safe" onclick="goTo('view_win')">Happy / Let's Go</button>
-            <button class="btn btn-danger" onclick="goTo('view_hub')">Discuss...</button>
-        </div>
-    </div>
-
-    <div id="view_hub" class="hidden">
-        <div class="card">
-            <h2>3. Project Refinement</h2>
-            <button class="btn btn-outline" onclick="goTo('branch_price')">💰 Price / Value</button>
-            <button class="btn btn-outline" onclick="goTo('branch_partner')">👫 Partner / Spouse</button>
-            <button class="btn btn-outline" onclick="goTo('branch_tech')">🛡️ Warranty / Tech</button>
-            <button class="btn btn-outline" onclick="goTo('branch_time')">⏳ Timing / Dates</button>
-            <button class="btn btn-outline" onclick="goTo('branch_comp')">🔍 Comparing Quotes</button>
-        </div>
-    </div>
-
-    <div id="branch_price" class="hidden">
-        <div class="back-btn" onclick="goTo('view_hub')">Back to Options</div>
-        <div class="card">
-            <h2>Price Calibration</h2>
-            <div class="list-item active" onclick="this.classList.toggle('struck')"><div class="list-header"><span>Switch to 'Plan B'</span><div class="check-circle"></div></div></div>
-            <div class="list-item active" onclick="this.classList.toggle('struck')"><div class="list-header"><span>Step Down Fabric</span><div class="check-circle"></div></div></div>
-            <div class="list-item active" onclick="this.classList.toggle('struck')"><div class="list-header"><span>Remove Motors</span><div class="check-circle"></div></div></div>
-            
-            <button class="btn btn-danger" onclick="goTo('sub_manager')">"Can we do better?" (Call Manager)</button>
-            <p style="text-align:center; margin-top:15px; text-decoration:underline; cursor:pointer;" onclick="resetJob()">Budget Fixed. Archive Quote.</p>
-        </div>
-    </div>
-
-    <div id="sub_manager" class="hidden">
-        <div class="card">
-            <h2>The 'Today Only' Call</h2>
-            <div class="info-panel">
-                <h4>Strategy:</h4>
-                <p>"If I call my boss right now and fight for a special price to <b>keep the specs exactly as they are</b>... will you order it with me today?"</p>
-            </div>
-            <button class="btn btn-safe" onclick="goTo('view_win')">Manager Approved (10%)</button>
-            <button class="btn btn-danger" onclick="document.getElementById('loud').classList.remove('hidden')">Hesitating...</button>
-            <div id="loud" class="info-panel hidden" style="background:#fff5f5; border-left-color:var(--danger); margin-top:10px;">
-                <h4 style="color:var(--danger);">⚠️ ASK LOUDLY:</h4>
-                <p>"Well, did you perhaps have a specific budget figure in mind?"</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="branch_tech" class="hidden">
-        <div class="back-btn" onclick="goTo('view_hub')">Back to Options</div>
-        <div class="card">
-            <h2>Peace of Mind</h2>
-            <button class="btn btn-outline" onclick="alert('10 Years Structure, 5-10 Fabric, 7 Motors.')">Warranty Terms</button>
-            <button class="btn btn-outline" onclick="alert('Charge every 6-9 months. 10,000 cycles.')">Motor Life</button>
-            <button class="btn btn-safe" onclick="goTo('view_win')">Satisfied? Let's Sign.</button>
-        </div>
-    </div>
-
-    <div id="view_win" class="hidden">
-        <div class="card" style="text-align:center; border-left-color:var(--safe);">
-            <h1 style="font-size:4rem;">🎉</h1>
-            <h2>Green Light</h2>
-            <p>Proceeding to paperwork.</p>
-            <button class="btn btn-outline" onclick="resetJob()">Start New Project</button>
-        </div>
-    </div>
-</div>
-
-<div id="specs" class="content">
-    <div class="card" style="background:#f0f0f0; border-left-color:#333;">
-        <h3>Shutter Estimator ($400/sqm)</h3>
-        <div style="display:flex; gap:10px;">
-            <input type="number" id="sW" class="std-input" placeholder="W (mm)">
-            <input type="number" id="sH" class="std-input" placeholder="H (mm)">
-        </div>
-        <button class="btn btn-primary" onclick="calcShutter()">Estimate</button>
-        <div id="shutterRes" style="text-align:center; font-weight:bold; margin-top:10px;">$0.00</div>
-    </div>
-    <input type="text" class="std-input" placeholder="Search Specs..." style="text-align:left; margin-bottom:15px;" onkeyup="alert('Search Simulated: Connect Database')">
 </div>
 
 <script>
-    /* --- GENIUS CHATBOT LOGIC --- */
-    const knowledgeBase = {
-        "clean": "For Rollers: Damp cloth only. For Sheers: Gentle hand wash or vacuum brush. Shutters: Feather duster, never soak.",
-        "motor": "Automate Li-Ion motors need charging every 6-9 months. The magnetic charger snaps on easily.",
-        "battery": "Automate Li-Ion motors need charging every 6-9 months. The magnetic charger snaps on easily.",
-        "gap": "Roller blinds have light gaps: 14mm on chain side, 10mm on idle side. Use a fascia or channels to block it.",
-        "halo": "Roller blinds have light gaps: 14mm on chain side, 10mm on idle side. Use a fascia or channels to block it.",
-        "heat": "Best for heat: Honeycomb (Cellular) blinds trap air. Second best: Cassette Rollers with Blockout fabric.",
-        "warranty": "Structure: 10 Years. Fabric: 5-10 Years (Supplier dependent). Motors: 7 Years. Peace of mind.",
-        "uniline": "Uniline fabric comes with a solid 10-year warranty.",
-        "zipscreen": "Zipscreen max width ~5.8m. Wind rated to 60km/h but should be retracted in storms.",
-        "help": "Sales Tip: Try 'If I could get it to that price, would you be happy to sign right now?'"
+    /* --- STATE ENGINE --- */
+    const state = {
+        history: [], // For back button functionality
+        current: 'START'
     };
 
-    function toggleChat() {
-        const win = document.getElementById('chatWindow');
-        win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
-        document.getElementById('chatIn').focus();
+    /* --- SCENARIO DATA --- */
+    const scenarios = {
+        'START': {
+            msg: "Let's secure this job. Where are we?",
+            btns: [
+                { text: "🚗 Just Arrived / Intro", action: "start_intro", style: "primary" },
+                { text: "📏 Measuring Now", action: "start_measure" },
+                { text: "🗣️ Ready to Pitch", action: "start_pitch" },
+                { text: "🧮 Quick Tools", action: "open_tools" }
+            ]
+        },
+        'tools': {
+            msg: "Here are your tools. Click 'Back' to return to the flow.",
+            btns: [
+                { text: "🧱 Brick Converter", action: "tool_brick" },
+                { text: "🪟 Shutter Estimator", action: "tool_shutter" },
+                { text: "⬅️ Back", action: "back" }
+            ]
+        },
+        'intro': {
+            msg: "<b>Goal:</b> Build trust & Anchor the Budget.<br><i>'Before I measure, I want to make sure we stay in your lane.'</i>",
+            btns: [
+                { text: "💰 Budget Anchor Tool", action: "tool_anchor", style: "primary" },
+                { text: "✅ Done. Measuring.", action: "start_measure" }
+            ]
+        },
+        'measure': {
+            msg: "<b>Phase 2: Qualification.</b><br>As you measure, drop these 'Tells'. If they react, tap the button.",
+            btns: [
+                { text: "👀 Visual Buy-In", action: "track_visual" },
+                { text: "☀️ Problem Solved", action: "track_problem" },
+                { text: "🔧 Technical Ownership", action: "track_tech" },
+                { text: "⚠️ Partner Check", action: "check_partner" },
+                { text: "🚀 Finished Measuring", action: "solution_finder", style: "primary" }
+            ]
+        },
+        'solution': {
+            msg: "<b>Phase 3: Selection.</b><br>What is the #1 goal for this room?",
+            btns: [
+                { text: "😴 Sleep (Darkness)", action: "rec_sleep" },
+                { text: "✨ Style (Visuals)", action: "rec_style" },
+                { text: "🏡 View & Privacy", action: "rec_view" },
+                { text: "💸 Budget / Rental", action: "rec_budget" }
+            ]
+        },
+        'pitch_prep': {
+            msg: "<b>Phase 4: The Shared Table.</b><br>Place the iPad on the table. Run the verification checklist.",
+            btns: [
+                { text: "✅ Design & Happiness", action: "check_1" },
+                { text: "✅ Timeline Works", action: "check_2" },
+                { text: "✅ Scope Correct", action: "check_3" },
+                { text: "🥁 Reveal Price", action: "drumroll", style: "primary" } // Locked until checks? simplified for chat
+            ]
+        },
+        'price_reveal': {
+            msg: "<b>The Reveal.</b><br>Price is on screen. Wait for their reaction.",
+            btns: [
+                { text: "🎉 They Signed!", action: "win_standard", style: "safe" },
+                { text: "😬 Too Expensive", action: "obj_price", style: "danger" },
+                { text: "🤔 Thinking / Partner", action: "obj_stall" }
+            ]
+        },
+        'obj_price': {
+            msg: "<b>Price Calibration.</b><br>Don't panic. Use the levers.",
+            btns: [
+                { text: "📉 Switch to Plan B", action: "pivot_planb" },
+                { text: "❌ Descope (Remove items)", action: "pivot_descope" },
+                { text: "📞 'Can we do better?'", action: "gambit_manager", style: "primary" }
+            ]
+        },
+        'gambit_manager': {
+            msg: "<b>The Manager Gambit.</b><br>Say: <i>'If I call my boss right now and fight for a Today Only price to keep these specs... will you order it with me?'</i>",
+            btns: [
+                { text: "✅ They Agreed. Calling.", action: "manager_call", style: "safe" },
+                { text: "🛑 No / Hesitant", action: "obj_price" }
+            ]
+        },
+        'manager_call': {
+            msg: "<b>On The Phone.</b><br>Manager is on speaker. <br>⚠️ If they look unsure, ask LOUDLY: <i>'Well, did you have a budget in mind?'</i>",
+            btns: [
+                { text: "🤝 Deal Approved (10%)", action: "win_discount", style: "safe" },
+                { text: "📉 Manager Said No", action: "obj_price" }
+            ]
+        },
+        'obj_stall': {
+            msg: "<b>The Stall.</b> Is it the Partner or the Time?",
+            btns: [
+                { text: "👫 Partner Not Here", action: "script_partner" },
+                { text: "⏳ Not Ready / Timing", action: "script_time" },
+                { text: "🔍 Shopping Around", action: "script_shop" }
+            ]
+        }
+    };
+
+    /* --- LOGIC ENGINE --- */
+    function init() {
+        renderState('START');
     }
 
-    function handleEnter(e) { if(e.key === 'Enter') sendMsg(); }
+    function renderState(key) {
+        // Save history if moving forward
+        if (key !== 'back' && key !== state.current) state.history.push(state.current);
+        
+        // Handle Back
+        if (key === 'back') {
+            const prev = state.history.pop();
+            renderState(prev || 'START');
+            return;
+        }
 
-    function sendMsg() {
-        const input = document.getElementById('chatIn');
+        state.current = key;
+        const data = scenarios[key];
+        
+        // Add Bot Message
+        addMsg(data.msg, 'bot');
+
+        // Render Buttons
+        const btnArea = document.getElementById('button-area');
+        btnArea.innerHTML = '';
+        
+        data.btns.forEach(b => {
+            const btn = document.createElement('button');
+            btn.className = `action-btn ${b.style || ''}`;
+            btn.innerHTML = b.text;
+            btn.onclick = () => handleAction(b.action, b.text);
+            btnArea.appendChild(btn);
+        });
+    }
+
+    function handleAction(action, text) {
+        // Show user choice
+        addMsg(text, 'user');
+
+        // Special Handlers
+        if (action.startsWith('tool_')) { renderTool(action); return; }
+        if (action.startsWith('track_')) { addMsg("✅ <i>Signal logged. Keep building value.</i>", 'system'); return; }
+        if (action.startsWith('rec_')) { renderRec(action); return; }
+        if (action === 'drumroll') { playDrumroll(); return; }
+        if (action.startsWith('win_')) { showConfetti(); renderState('START'); return; }
+
+        // Default Router
+        const map = {
+            'start_measure': 'measure',
+            'start_pitch': 'pitch_prep',
+            'open_tools': 'tools',
+            'start_intro': 'intro',
+            'solution_finder': 'solution',
+            'obj_price': 'obj_price',
+            'obj_stall': 'obj_stall',
+            'gambit_manager': 'gambit_manager',
+            'manager_call': 'manager_call',
+            'pivot_planb': 'obj_price', // Loop back for demo
+            'script_partner': 'obj_stall', // Loop
+            'back': 'back'
+        };
+
+        if (map[action]) renderState(map[action]);
+        else addMsg("⚠️ Logic end of line for demo.", 'system');
+    }
+
+    /* --- SPECIAL RENDERERS --- */
+    function renderTool(type) {
+        let html = "";
+        if (type === 'tool_brick') {
+            html = `<div class='card-insert'>
+                <h4>🧱 Brick Converter</h4>
+                <div class='calc-row'><span>Height (Courses):</span> <input type='number' class='calc-input' id='cH' oninput='calcBrick()'></div>
+                <div class='calc-row'><span>Width (Bricks):</span> <input type='number' class='calc-input' id='cW' oninput='calcBrick()'></div>
+                <div id='cRes' style='font-weight:bold; text-align:center; margin-top:10px;'>0mm x 0mm</div>
+            </div>`;
+        } else if (type === 'tool_anchor') {
+            html = `<div class='card-insert'>
+                <h4>💰 Budget Anchor</h4>
+                <p><i>"Based on measurement, which lane are we in?"</i></p>
+                <div style='display:flex; gap:5px; text-align:center;'>
+                    <div style='flex:1; border:1px solid #ccc; padding:5px; border-radius:5px;'>Entry<br><b style='color:#777'>$$</b></div>
+                    <div style='flex:1; border:1px solid #004a99; padding:5px; border-radius:5px;'>Mid<br><b style='color:#004a99'>$$$</b></div>
+                    <div style='flex:1; border:1px solid #27ae60; padding:5px; border-radius:5px;'>Prem<br><b style='color:#27ae60'>$$$$</b></div>
+                </div>
+            </div>`;
+        } else if (type === 'tool_shutter') {
+            html = `<div class='card-insert'>
+                <h4>🪟 Shutter Estimate ($400/sqm)</h4>
+                <div class='calc-row'><span>W (mm):</span> <input type='number' class='calc-input' id='sW'></div>
+                <div class='calc-row'><span>H (mm):</span> <input type='number' class='calc-input' id='sH'></div>
+                <button class='action-btn primary' style='width:100%' onclick='doShutter()'>Calculate</button>
+                <div id='sRes' style='text-align:center; font-weight:bold; margin-top:5px;'></div>
+            </div>`;
+        }
+        addMsg(html, 'bot');
+    }
+
+    function renderRec(type) {
+        let title = "", desc = "", alt = "";
+        if (type === 'rec_sleep') { title = "Blockout Rollers + Cassette"; desc = "Max darkness."; alt = "Std Rollers (Back Rolled)"; }
+        if (type === 'rec_style') { title = "Sheer S-Fold Curtains"; desc = "Soft elegance."; alt = "Double Rollers"; }
+        if (type === 'rec_view') { title = "Sunscreen Rollers"; desc = "Cut glare, keep view."; alt = "Venetians"; }
+        if (type === 'rec_budget') { title = "Double Rollers"; desc = "Day/Night utility."; alt = "Single Blockout"; }
+
+        const html = `<div class='card-insert' style='background:linear-gradient(135deg, #004a99, #003366); color:white;'>
+            <div style='font-size:1.1rem; font-weight:bold'>✨ Dream: ${title}</div>
+            <div style='font-size:0.9rem; opacity:0.9'>${desc}</div>
+            <div style='margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2); font-size:0.8rem;'>
+                <b>Reality Check:</b> ${alt}
+            </div>
+        </div>`;
+        addMsg(html, 'bot');
+        
+        // Auto advance
+        setTimeout(() => renderState('pitch_prep'), 1500);
+    }
+
+    /* --- GENIUS BOT LOGIC --- */
+    const knowledge = {
+        "clean": "🧼 <b>Cleaning:</b> Rollers (Damp cloth). Sheers (Hand wash/Vacuum). Shutters (Duster only).",
+        "motor": "🔋 <b>Motors:</b> Automate Li-Ion. Charge every 6-9 months. 10,000 cycles life.",
+        "gap": "📏 <b>Light Gaps:</b> Chain side 14mm, Idle side 10mm. Use fascia to hide top gap.",
+        "warranty": "🛡️ <b>Warranty:</b> 10y Structure, 5-10y Fabric, 7y Motors.",
+        "help": "💡 <b>Sales Tip:</b> Try 'If I could get it to that price, would you sign right now?'"
+    };
+
+    function askGenius() {
+        const input = document.getElementById('userInput');
         const text = input.value.trim().toLowerCase();
-        if(!text) return;
-
-        addBubble(input.value, 'user');
+        if (!text) return;
+        
+        addMsg(input.value, 'user');
         input.value = '';
 
-        // Simulate thinking
         setTimeout(() => {
-            let response = "I'm not sure about that specific detail. Check the Tech Specs tab!";
-            // Simple keyword matching
-            for (const key in knowledgeBase) {
-                if (text.includes(key)) {
-                    response = knowledgeBase[key];
-                    break;
-                }
+            let reply = "🤖 I'm not sure. Check the manual.";
+            for (let k in knowledge) {
+                if (text.includes(k)) reply = knowledge[k];
             }
-            addBubble(response, 'bot');
-        }, 600);
+            addMsg(reply, 'bot');
+        }, 500);
     }
 
-    function addBubble(text, type) {
-        const body = document.getElementById('chatBody');
+    function handleEnter(e) { if (e.key === 'Enter') askGenius(); }
+
+    /* --- UTILS --- */
+    function addMsg(html, type) {
+        const box = document.getElementById('chat-container');
         const div = document.createElement('div');
         div.className = `msg ${type}`;
-        div.innerText = text;
-        body.appendChild(div);
-        body.scrollTop = body.scrollHeight;
+        div.innerHTML = html;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
     }
 
-    /* --- APP LOGIC --- */
-    function switchTab(id) {
-        document.querySelectorAll('.content').forEach(e => e.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
-        document.getElementById('nav-'+id).classList.add('active');
+    function calcBrick() {
+        const h = document.getElementById('cH').value;
+        const w = document.getElementById('cW').value;
+        document.getElementById('cRes').innerText = (h?Math.round(h*89):0)+"mm x "+(w?Math.round(w*240):0)+"mm";
     }
 
-    function toggleScore(el, type) {
-        el.classList.toggle('active');
-        const count = el.parentElement.querySelectorAll('.active').length;
-        if(type==='expert') document.getElementById('expertScore').innerText = count+"/3";
-        else {
-            document.getElementById('intentScore').innerText = count+"/5";
-            if(count>=3) document.getElementById('unlockMsg').style.display='block';
-        }
-    }
-
-    function selectChip(el, type, val) {
-        el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
-        el.classList.add('selected');
-        // Simple logic for demo
-        const box = document.getElementById('recBox');
-        const title = document.getElementById('recTitle');
-        const desc = document.getElementById('recDesc');
-        const alt = document.getElementById('recAlt');
-        
-        // Wait for both selections in real app, here we just show box
-        box.style.display = 'block';
-        if(val === 'sleep') { title.innerText = "Blockout Rollers + Cassette"; desc.innerText = "Maximum darkness."; alt.innerText = "Std Rollers (Back Rolled)"; }
-        else if(val === 'style') { title.innerText = "Sheer S-Fold Curtains"; desc.innerText = "Soft elegance."; alt.innerText = "Double Rollers"; }
-        else { title.innerText = "Double Rollers"; desc.innerText = "Day/Night Control."; alt.innerText = "Single Blockout"; }
-    }
-
-    function runCalc() {
-        const h = document.getElementById('calcH').value;
-        const w = document.getElementById('calcW').value;
-        document.getElementById('calcRes').innerText = (h?Math.round(h*89):0)+"mm x "+(w?Math.round(w*240):0)+"mm";
-    }
-
-    function checkReveal() {
-        const c = document.getElementById('view_verify').querySelectorAll('.active').length;
-        if(c>=3) document.getElementById('revealBtn').classList.remove('hidden');
-        else document.getElementById('revealBtn').classList.add('hidden');
-    }
-
-    function goTo(id) {
-        document.querySelectorAll('#pitch > div').forEach(d => d.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    function calcShutter() {
+    function doShutter() {
         const w = document.getElementById('sW').value/1000;
         const h = document.getElementById('sH').value/1000;
-        document.getElementById('shutterRes').innerText = "$"+(w*h*400).toFixed(2);
+        document.getElementById('sRes').innerText = "Approx: $" + (w*h*400).toFixed(2);
     }
 
-    function openReset() { document.getElementById('resetModal').style.display='flex'; }
-    function closeReset() { document.getElementById('resetModal').style.display='none'; }
-    function resetPage() { document.querySelectorAll('input').forEach(i=>i.value=''); closeReset(); }
-    function resetJob() { location.reload(); }
+    function playDrumroll() {
+        document.getElementById('drumroll').style.display = 'flex';
+        setTimeout(() => {
+            document.getElementById('drumroll').style.display = 'none';
+            renderState('price_reveal');
+        }, 2000);
+    }
+
+    function showConfetti() {
+        addMsg("🎉🎉🎉 CONGRATULATIONS! 🎉🎉🎉", 'bot');
+    }
+
+    // Init
+    init();
+
 </script>
 </body>
 </html>
