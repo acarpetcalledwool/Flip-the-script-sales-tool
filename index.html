@@ -3,535 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mega Blinds Sales Maze</title>
+    <title>Mega Blinds Sales Hub 2.3</title>
     <style>
         :root { 
             --p: #004a99; /* Mega Blue */
-            --bg: #f0f2f5; 
+            --bg: #f4f6f8; 
             --card-bg: #ffffff;
-            --txt: #1a1a1a;
+            --txt: #2c3e50;
             --safe: #27ae60;
             --warn: #f39c12;
-            --danger: #c0392b;
-            --subtle: #bdc3c7;
+            --danger: #e74c3c;
+            --subtle: #95a5a6;
+            --chat-bg: #eef2f5;
         }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
-            color: var(--txt); 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh;
-            overflow: hidden; 
+            background: var(--bg); color: var(--txt); margin: 0; padding: 0; 
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER & NAV --- */
         .header {
-            background: var(--card-bg);
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            position: relative;
+            background: var(--card-bg); padding: 10px; box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            display: flex; justify-content: center; align-items: center; z-index: 100;
         }
         .nav-pill-container {
-            display: flex;
-            background: #ecf0f1;
-            border-radius: 50px;
-            padding: 5px;
-            width: 100%;
-            max-width: 650px;
-            transition: all 0.3s ease;
+            display: flex; background: #ecf0f1; border-radius: 50px; padding: 4px;
+            width: 100%; max-width: 800px; overflow-x: auto;
         }
         .nav-pill {
-            flex: 1;
-            text-align: center;
-            padding: 14px;
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: #bdc3c7;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            pointer-events: none; /* Locked by default */
+            flex: 1; text-align: center; padding: 12px 8px; font-size: 0.85rem; font-weight: 700;
+            color: #bdc3c7; border-radius: 40px; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
         }
-        .nav-pill.active {
-            background: var(--card-bg);
-            color: var(--p);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            pointer-events: auto;
-        }
-        .nav-pill.unlocked {
-            color: #7f8c8d;
-            pointer-events: auto;
-        }
-        .nav-pill.vanished {
-            flex: 0; padding: 0; margin: 0; opacity: 0; width: 0; pointer-events: none;
-        }
+        .nav-pill.active { background: var(--card-bg); color: var(--p); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         
-        /* Stealth Reset */
         .reset-icon {
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
-            font-size: 1.2rem; color: #bdc3c7; opacity: 0.2; cursor: pointer; transition: 0.2s;
+            position: absolute; right: 10px; font-size: 1.4rem; color: #bdc3c7; opacity: 0.3;
+            cursor: pointer; padding: 10px; transition: 0.2s;
         }
         .reset-icon:hover { opacity: 1; color: var(--danger); }
 
         /* --- CONTENT --- */
         .content {
-            flex: 1; overflow-y: auto; padding: 25px;
-            max-width: 750px; margin: 0 auto; width: 100%;
-            display: none; box-sizing: border-box;
+            flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; /* Space for FAB */
+            max-width: 800px; margin: 0 auto; width: 100%; display: none; box-sizing: border-box;
         }
-        .content.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .content.active { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- CARDS --- */
+        /* --- CARDS & UI --- */
         .card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-            margin-bottom: 20px;
-            border-left: 6px solid var(--p);
+            background: var(--card-bg); border-radius: 16px; padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 15px;
+            border-left: 5px solid var(--p);
         }
-        .card h2 { margin-top: 0; color: var(--p); font-size: 1.3rem; margin-bottom: 10px; }
-        .card h3 { margin: 0 0 5px 0; font-size: 1rem; color: #34495e; }
-        .card p { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.4; }
+        .card h2 { margin: 0 0 10px 0; color: var(--p); font-size: 1.25rem; }
+        .card p { color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; }
 
-        /* --- CHECKBOX ITEMS --- */
-        .intent-item {
-            background: white; border: 1px solid #eee; border-radius: 12px;
-            padding: 15px; margin-bottom: 12px; transition: 0.2s; cursor: pointer;
+        /* --- GENIUS CHATBOT UI --- */
+        #geniusFab {
+            position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px;
+            background: var(--p); border-radius: 50%; box-shadow: 0 4px 20px rgba(0,74,153,0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 30px;
+            cursor: pointer; z-index: 1000; transition: transform 0.2s; color: white;
         }
-        .intent-item.active { border-color: var(--safe); background: #f0fff4; }
+        #geniusFab:active { transform: scale(0.9); }
         
-        .script-detail {
-            font-size: 0.85rem; color: #555; margin-top: 5px; line-height: 1.4;
+        #chatWindow {
+            position: fixed; bottom: 90px; right: 20px; width: 350px; height: 500px;
+            background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000; display: none; flex-direction: column; overflow: hidden;
+            border: 1px solid #eee; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .script-detail i { color: #004a99; font-weight: 600; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .checkbox-row { display: flex; align-items: center; justify-content: space-between; }
-        .check-circle {
-            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ccc;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        .chat-header {
+            background: var(--p); color: white; padding: 15px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .intent-item.active .check-circle { background: var(--safe); border-color: var(--safe); color: white; }
-        .intent-item.active .check-circle:after { content: '✓'; font-weight: bold; }
-
-        /* YES/NO TOGGLE */
-        .toggle-container { display: flex; gap: 10px; margin-top: 5px; }
-        .toggle-btn {
-            flex: 1; padding: 10px; border: 2px solid #eee; border-radius: 8px;
-            text-align: center; font-weight: 700; color: #95a5a6; cursor: pointer;
+        .chat-body {
+            flex: 1; padding: 15px; overflow-y: auto; background: var(--chat-bg);
+            display: flex; flex-direction: column; gap: 10px;
         }
-        .toggle-btn.yes.selected { background: var(--safe); border-color: var(--safe); color: white; }
-        .toggle-btn.no.selected { background: var(--danger); border-color: var(--danger); color: white; }
-        .partner-warning { 
-            font-size: 0.85rem; color: var(--danger); background: #fff5f5; 
-            padding: 10px; border-radius: 8px; margin-top: 10px; display: none; 
+        .chat-input-area {
+            padding: 10px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px;
         }
-
-        /* --- PITCH UI --- */
-        .checklist-item {
-            background: #f8f9fa; border: 2px solid #eee; border-radius: 12px;
-            padding: 18px; margin-bottom: 12px; display: flex; align-items: center;
-            cursor: pointer; transition: 0.2s;
+        .chat-input {
+            flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none;
         }
-        .checklist-item.active { background: #fff; border-color: var(--safe); box-shadow: 0 4px 15px rgba(39,174,96,0.15); }
+        .chat-send {
+            background: var(--p); color: white; border: none; padding: 0 15px; border-radius: 20px; cursor: pointer;
+        }
         
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .btn-full { width: 100%; margin-top: 20px; }
-        .btn {
-            padding: 18px; border-radius: 14px; border: none; font-weight: 700; font-size: 1.05rem;
-            cursor: pointer; transition: 0.2s; text-align: center;
+        .msg { padding: 10px 15px; border-radius: 15px; font-size: 0.9rem; line-height: 1.4; max-width: 80%; }
+        .msg.bot { background: white; align-self: flex-start; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .msg.user { background: var(--p); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        /* --- SOLUTION FINDER CHIPS --- */
+        .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .chip {
+            padding: 10px 15px; background: #fff; border: 2px solid #eee; border-radius: 25px;
+            font-weight: 600; color: #7f8c8d; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
         }
-        .btn-primary { 
-            background: var(--p); color: white; box-shadow: 0 4px 15px rgba(0,74,153,0.3);
-            animation: pulse 2s infinite; 
-        }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 74, 153, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 74, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 74, 153, 0); } }
+        .chip.selected { background: #eef6ff; color: var(--p); border-color: var(--p); }
         
+        .recommendation-box {
+            background: linear-gradient(135deg, #004a99 0%, #003366 100%);
+            color: white; padding: 20px; border-radius: 12px; margin-top: 15px; display: none;
+        }
+        .reality-check { 
+            background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; 
+            font-size: 0.85rem; margin-top: 10px; display: none;
+        }
+
+        /* --- STANDARD UI ELEMENTS --- */
+        .list-item { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
+        .list-item.active { background: #f0f9ff; border-color: var(--p); }
+        .list-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+        .list-detail { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; font-size: 0.9rem; color: #555; font-style: italic; }
+        .list-item.active .list-detail { display: block; }
+        .check-circle { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; }
+        .list-item.active .check-circle { background: var(--p); border-color: var(--p); color: white; }
+        .list-item.active .check-circle:after { content: '✓'; font-size: 12px; }
+
+        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; margin-top:10px;}
+        .btn-primary { background: var(--p); color: white; }
         .btn-safe { background: var(--safe); color: white; }
-        .btn-danger { background: #fff5f5; color: var(--danger); border: 2px solid #ffcdd2; }
+        .btn-danger { background: #fff5f5; color: var(--danger); border: 1px solid #ffcdd2; }
         .btn-outline { background: white; border: 2px solid #eee; color: #7f8c8d; }
+        
+        .std-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1.1rem; text-align: center; box-sizing: border-box; }
+        .info-panel { background: #f9f9f9; border-radius: 12px; padding: 15px; border-left: 4px solid var(--subtle); margin-bottom: 15px; }
 
-        /* --- MODAL --- */
-        #resetModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 500; display: none;
-            align-items: center; justify-content: center;
-        }
-        .modal-box { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; text-align: center; }
-        .modal-btn { width: 100%; padding: 15px; margin-top: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; }
-        
-        /* --- DRUMROLL --- */
-        #drumrollOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95); z-index: 200;
-            display: none; align-items: center; justify-content: center; flex-direction: column;
-        }
-        .drum-icon { font-size: 4rem; animation: shake 0.1s infinite; }
-        .drum-text { margin-top: 20px; font-size: 1.5rem; color: var(--p); font-weight: 800; }
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 75% { transform: rotate(-5deg); } }
-
-        /* --- CALCULATORS --- */
-        .calc-row { display: flex; align-items: center; margin-bottom: 10px; }
-        .calc-label { width: 120px; font-size: 0.9rem; font-weight: bold; color: #555; }
-        .calc-inp { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 1.2rem; text-align: center; box-sizing: border-box; font-weight:bold; color:var(--p); }
-        .calc-res { background: var(--p); color: white; border-radius: 12px; padding: 20px; text-align: center; font-weight: 800; font-size: 1.5rem; margin-top:15px; }
-        
-        /* --- TECH SPECS UI --- */
-        .search-input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; }
-        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .cat-card { background: white; padding: 20px; border-radius: 16px; text-align: center; font-weight: 700; color: #555; border: 2px solid #eee; cursor: pointer; }
-        .tech-list-item { background: white; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; color: #333; }
-        .spec-detail { background: white; border-radius: 12px; padding: 20px; line-height: 1.6; color: #444; }
-        .redirect-box { background: #eef6ff; border-radius: 16px; padding: 20px; margin-top: 20px; border-left: 4px solid var(--p); }
-        .rep-prompt { color: var(--p); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; background: #e3f2fd; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #bbdefb; }
-        .rep-prompt.urgent { color: #c0392b; background: #fff5f5; border-color: #ffcdd2; }
-        
         .hidden { display: none !important; }
-        .struck { text-decoration: line-through; color: #bdc3c7; background: #f9f9f9; }
+        .struck { text-decoration: line-through; opacity: 0.6; }
     </style>
 </head>
 <body>
 
-<div id="resetModal">
-    <div class="modal-box">
-        <h3>Reset Options</h3>
-        <button class="modal-btn" style="background:#eef6ff; color:var(--p);" onclick="resetPage()">Clear Current Page</button>
-        <button class="modal-btn" style="background:#fff5f5; color:var(--danger);" onclick="resetJob()">⚠️ Reset Job (Staff Only)</button>
-        <button class="modal-btn" style="background:transparent; color:#999;" onclick="closeReset()">Cancel</button>
+<div id="geniusFab" onclick="toggleChat()">🤖</div>
+
+<div id="chatWindow">
+    <div class="chat-header">
+        <span>Window Genius</span>
+        <span onclick="toggleChat()" style="cursor:pointer;">✕</span>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div class="msg bot">Hi! I'm the Mega Blinds Genius. Ask me anything about specs, cleaning, motors, or sales tactics.</div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatIn" class="chat-input" placeholder="Ask the genius..." onkeypress="handleEnter(event)">
+        <button class="chat-send" onclick="sendMsg()">➤</button>
     </div>
 </div>
 
-<div id="drumrollOverlay">
-    <div class="drum-icon">🎁</div>
-    <div class="drum-text">Calculating Best Value...</div>
+<div id="resetModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:900;display:none;align-items:center;justify-content:center;">
+    <div style="background:white;padding:25px;border-radius:16px;width:300px;text-align:center;">
+        <h3>Reset Options</h3>
+        <button class="btn btn-outline" onclick="resetPage()">Clear Page</button>
+        <button class="btn btn-danger" onclick="resetJob()">Start New</button>
+        <p onclick="closeReset()" style="margin-top:10px;color:#999;cursor:pointer;">Cancel</p>
+    </div>
 </div>
 
 <div class="header">
     <div class="nav-pill-container">
+        <div id="nav-solution" class="nav-pill" onclick="switchTab('solution')">Solution Finder</div>
         <div id="nav-pocket" class="nav-pill active" onclick="switchTab('pocket')">Pocket Mode</div>
-        <div id="nav-pitch" class="nav-pill" onclick="switchTab('pitch')">Shared Table 🔒</div>
-        <div id="nav-specs" class="nav-pill unlocked" onclick="switchTab('specs')">Tech Data</div>
+        <div id="nav-pitch" class="nav-pill" onclick="switchTab('pitch')">Shared Table</div>
+        <div id="nav-specs" class="nav-pill" onclick="switchTab('specs')">Tech Specs</div>
     </div>
-    <div class="reset-icon" onclick="openReset()" title="Reset">↻</div>
+    <div class="reset-icon" onclick="openReset()">↻</div>
+</div>
+
+<div id="solution" class="content">
+    <div class="card">
+        <h2>🎯 Best Solution Tool</h2>
+        <p>What defines success for this room?</p>
+        
+        <h4 style="margin:10px 0; color:#555;">1. The Goal</h4>
+        <div class="chip-grid" id="goalChips">
+            <div class="chip" onclick="selectChip(this, 'goal', 'sleep')">Darkness (Sleep)</div>
+            <div class="chip" onclick="selectChip(this, 'goal', 'style')">Visuals (Style)</div>
+            <div class="chip" onclick="selectChip(this, 'goal', 'view')">View & Privacy</div>
+            <div class="chip" onclick="selectChip(this, 'goal', 'budget')">Budget / Rental</div>
+        </div>
+
+        <h4 style="margin:10px 0; color:#555;">2. The Room</h4>
+        <div class="chip-grid" id="roomChips">
+            <div class="chip" onclick="selectChip(this, 'room', 'bed')">Bedroom</div>
+            <div class="chip" onclick="selectChip(this, 'room', 'living')">Living Area</div>
+            <div class="chip" onclick="selectChip(this, 'room', 'wet')">Wet Area</div>
+        </div>
+
+        <div id="recBox" class="recommendation-box">
+            <div style="font-size:1.2rem; font-weight:800;">✨ The Dream: <span id="recTitle"></span></div>
+            <div style="font-size:0.9rem; opacity:0.9; margin-bottom:15px;" id="recDesc"></div>
+            <div class="reality-check">
+                <b>Reality Check (Plan B):</b> <span id="recAlt"></span>
+                <br><i>Suggest this if budget is tight.</i>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="pocket" class="content active">
     
     <div class="card" style="border-left-color: #bdc3c7;">
-        <h2>💡 Expertise Score <span id="expertScore" style="float:right; color:#ccc;">0/3</span></h2>
-        <p>Did you demonstrate value? Tick when you have said or done these specific things:</p>
-        
-        <div class="intent-item" id="exp1" onclick="toggleExpert('exp1')">
-            <div class="checkbox-row"><b>1. Aesthetics (The Fix)</b><div class="check-circle"></div></div>
-            <div class="script-detail">Did you suggest a fix they missed?<br><i>"I can reverse roll this so the tube is hidden."</i></div>
+        <div style="display:flex; justify-content:space-between;">
+            <h2>💡 Expertise Score</h2>
+            <span id="expertScore" style="font-weight:bold; color:#bdc3c7;">0/3</span>
         </div>
-
-        <div class="intent-item" id="exp2" onclick="toggleExpert('exp2')">
-            <div class="checkbox-row"><b>2. Design (The Match)</b><div class="check-circle"></div></div>
-            <div class="script-detail">Did you link it to their furniture?<br><i>"This texture connects the rug to the walls perfectly."</i></div>
-        </div>
-
-        <div class="intent-item" id="exp3" onclick="toggleExpert('exp3')">
-            <div class="checkbox-row"><b>3. Technical (The Foresight)</b><div class="check-circle"></div></div>
-            <div class="script-detail">Did you solve a future problem?<br><i>"We need 60mm clearance here for the handle."</i></div>
-        </div>
+        <p>Tick when you have demonstrated these:</p>
+        <div class="list-item" onclick="toggleScore(this, 'expert')"><div class="list-header"><span>1. The Aesthetics Fix</span><div class="check-circle"></div></div><div class="list-detail">"I can change the roll direction so the tube is hidden."</div></div>
+        <div class="list-item" onclick="toggleScore(this, 'expert')"><div class="list-header"><span>2. The Design Match</span><div class="check-circle"></div></div><div class="list-detail">"This texture ties the rug and walls together perfectly."</div></div>
+        <div class="list-item" onclick="toggleScore(this, 'expert')"><div class="list-header"><span>3. The Future Proof</span><div class="check-circle"></div></div><div class="list-detail">"We need a projection bracket to clear that handle."</div></div>
     </div>
 
     <div class="card">
-        <h2>Intention Monitor <span id="scoreDisplay" style="float:right; color:#ccc;">0/5</span></h2>
-        <p>Score the client's behaviour. <b>Minimum 3/5</b> unlocks Pitch Mode.</p>
-
-        <div class="intent-item" id="intent1" onclick="toggleIntent('intent1')">
-            <div class="checkbox-row"><b>1. Visual Buy-In</b><div class="check-circle"></div></div>
-            <div class="script-detail"><b>Tell:</b> Touching fabric/nodding.<br><i>"Can you see this working with the sofa?"</i></div>
+        <div style="display:flex; justify-content:space-between;">
+            <h2>❤️ Intention Monitor</h2>
+            <span id="intentScore" style="font-weight:bold; color:#bdc3c7;">0/5</span>
         </div>
+        <p>Score the client's buy-in.</p>
+        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>1. Visual Ownership</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Touching fabric. <i>"Can you picture this here?"</i></div></div>
+        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>2. Problem Solved</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Relief. <i>"Imagine that glare gone tomorrow."</i></div></div>
+        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>3. Technical Buy-In</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Logistics. <i>"Chain on the left?"</i></div></div>
+        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>4. All Decision Makers?</span><div class="check-circle"></div></div><div class="list-detail"><b>Risk:</b> If No, ask: <i>"Do they need to see this?"</i></div></div>
+        <div class="list-item" onclick="toggleScore(this, 'intent')"><div class="list-header"><span>5. Engagement Level</span><div class="check-circle"></div></div><div class="list-detail"><b>Tell:</b> Asking about price/timelines openly.</div></div>
+        <div id="unlockMsg" style="text-align:center; color:#27ae60; font-weight:bold; display:none; margin-top:10px;">Ready for Table 🚀</div>
+    </div>
 
-        <div class="intent-item" id="intent2" onclick="toggleIntent('intent2')">
-            <div class="checkbox-row"><b>2. Problem Solved</b><div class="check-circle"></div></div>
-            <div class="script-detail"><b>Tell:</b> Sigh of relief regarding heat/glare.<br><i>"Imagine that glare gone tomorrow."</i></div>
-        </div>
-
-        <div class="intent-item" id="intent3" onclick="toggleIntent('intent3')">
-            <div class="checkbox-row"><b>3. Ownership</b><div class="check-circle"></div></div>
-            <div class="script-detail"><b>Tell:</b> Discussing operation/logistics.<br><i>"Shall we put the chain on the left?"</i></div>
-        </div>
-
-        <div class="intent-item" id="intent4">
-            <div style="margin-bottom:5px;"><b>4. Partner / Decision Maker</b></div>
-            <div class="toggle-container">
-                <div id="pYes" class="toggle-btn yes" onclick="setPartner(true)">Present (YES)</div>
-                <div id="pNo" class="toggle-btn no" onclick="setPartner(false)">Absent (NO)</div>
-            </div>
-            <div id="pWarn" class="partner-warning">⚠️ <b>Stop:</b> Don't pitch yet. Ask:<br><i>"Will [Partner] need to see this before we proceed?"</i></div>
-        </div>
-
-        <div class="intent-item" id="intent5" onclick="toggleIntent('intent5')">
-            <div class="checkbox-row"><b>5. Engagement</b><div class="check-circle"></div></div>
-            <div class="script-detail"><b>Tell:</b> Open body language, asking for price/timeline.</div>
-        </div>
-
-        <div id="unlockMsg" style="text-align:center; color:#27ae60; font-weight:bold; display:none; margin-top:10px;">🔓 Pitch Mode Unlocked</div>
+    <div class="card" style="background:#eef6ff; border-left-color:#004a99;">
+        <h2>🔄 The Pivot Plan</h2>
+        <p>Establish the Dream and the Backup.</p>
+        <div style="font-weight:bold; color:#004a99;">Plan A (Dream): <input type="text" class="std-input" placeholder="e.g. Shutters"></div>
+        <div style="font-weight:bold; color:#555; margin-top:10px;">Plan B (Backup): <input type="text" class="std-input" placeholder="e.g. Venetians"></div>
+        <p style="text-align:center; font-style:italic; font-size:0.85rem; margin-top:5px;">"If Plan A is over budget, are we happy to fall back to Plan B?"</p>
     </div>
 
     <div class="card">
-        <h2>Plan Decoder</h2>
-        <div class="calc-row">
-            <span class="calc-label">Height (Courses)</span>
-            <input type="number" id="hInput" class="calc-inp" placeholder="0">
+        <h2>📏 Quick Converter</h2>
+        <div style="display:flex; gap:10px;">
+            <input type="number" class="std-input" id="calcH" placeholder="Height (Courses)" oninput="runCalc()">
+            <input type="number" class="std-input" id="calcW" placeholder="Width (Bricks)" oninput="runCalc()">
         </div>
-        <div class="calc-row">
-            <span class="calc-label">Width (Bricks)</span>
-            <input type="number" id="wInput" class="calc-inp" placeholder="0">
-        </div>
-        <div class="btn-grid">
-            <button class="btn btn-outline" onclick="resetCalc()">Reset</button>
-            <button class="btn btn-primary" onclick="runCalc()" style="animation:none;">Calculate</button>
-        </div>
-        <div id="cResult" class="calc-res">0 mm x 0 mm</div>
+        <div style="background:#333; color:white; padding:15px; border-radius:8px; text-align:center; font-weight:bold; font-size:1.2rem; margin-top:10px;" id="calcRes">0mm x 0mm</div>
     </div>
 </div>
 
 <div id="pitch" class="content">
-
-    <div id="step_value" class="card">
-        <h2>1. Package Verification</h2>
-        <p>Before we view the investment, let's confirm this solves the problem.</p>
-        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Design & Happiness</b><br><span style="font-size:0.85rem; color:#666;">Excited about the fabric/look?</span></div></div>
-        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Lead Time Suitability</b><br><span style="font-size:0.85rem; color:#666;">Timeline works for the project?</span></div></div>
-        <div class="checklist-item" onclick="toggleCheck(this)"><div class="check-circle"></div><div><b>Scope Accuracy</b><br><span style="font-size:0.85rem; color:#666;">All windows covered correctly?</span></div></div>
-        <button id="revealBtn" class="btn btn-primary btn-full hidden" onclick="playDrumroll()">Everything Correct. Reveal Investment.</button>
-    </div>
-
-    <div id="step_reveal" class="card hidden">
-        <h2>2. Investment Overview</h2>
-        <div class="rep-prompt">📢 REP: Present RETAIL Price to Customer</div>
-        <div style="background:#f4f9ff; padding:30px; border-radius:16px; text-align:center; margin-bottom:20px; border:2px solid var(--p);">
-            <div style="font-size:0.9rem; text-transform:uppercase; color:var(--p); font-weight:800; margin-bottom:10px;">Total Project Investment</div>
-            <div style="font-size:1.5rem; font-weight:700; color:#2c3e50;">[ STATE PRICE ]</div>
-        </div>
-        <div class="btn-grid">
-            <button class="btn btn-safe" onclick="nextStep('step_win')">Happy / Let's Go</button>
-            <button class="btn btn-danger" onclick="nextStep('step_discount5')">Too Expensive</button>
-        </div>
-        <div class="btn-full" style="margin-top:15px;"><button class="btn btn-outline" onclick="nextStep('step_crossroads')">Something Else...</button></div>
-    </div>
-
-    <div id="step_crossroads" class="card hidden">
-        <h2>3. Project Review</h2>
-        <p>What is holding us back?</p>
-        <div class="objection-grid">
-            <div class="obj-btn" onclick="nextStep('maze_partner')">👫 Partner / Spouse</div>
-            <div class="obj-btn" onclick="nextStep('maze_shop')">🔍 Product Match</div>
-            <div class="obj-btn" onclick="nextStep('maze_time')">⏳ Timing</div>
+    
+    <div id="view_verify">
+        <div class="card">
+            <h2>1. Package Verification</h2>
+            <div class="list-item" onclick="this.classList.toggle('active'); checkReveal()"><div class="list-header"><span>Design & Happiness</span><div class="check-circle"></div></div></div>
+            <div class="list-item" onclick="this.classList.toggle('active'); checkReveal()"><div class="list-header"><span>Timeline Suitability</span><div class="check-circle"></div></div></div>
+            <div class="list-item" onclick="this.classList.toggle('active'); checkReveal()"><div class="list-header"><span>Scope Check</span><div class="check-circle"></div></div></div>
+            <button id="revealBtn" class="btn btn-primary hidden" onclick="goTo('view_price')">All Correct. Reveal Price.</button>
         </div>
     </div>
 
-    <div id="step_discount5" class="card hidden">
-        <h2 style="color:var(--p);">Strategic Adjustment</h2>
-        <div class="rep-prompt">📢 REP: Offer 5% Discount to seal it now.</div>
-        <div class="redirect-box"><span class="redirect-title">Proposal</span><p style="margin:0;">"I can authorize a <b>5% Manager's Discount</b> right now if we secure the production slot today."</p></div>
-        <div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Client Accepted (Sign)</button><button class="btn btn-danger" onclick="nextStep('step_align')">Still Too High</button></div>
-    </div>
-
-    <div id="step_align" class="card hidden">
-        <h2 style="color:var(--p);">Quality Defense</h2>
-        <div class="rep-prompt urgent">📢 REP: Do not drop quality yet. Align with Client.</div>
-        <div class="redirect-box"><p style="margin:0;">"I mean, I think we <i>could</i> get the price down... but we would have to <b>sacrifice the quality</b> or lose that specific fabric you loved. I really don't want to do that."</p></div>
-        <div class="btn-grid"><button class="btn btn-primary" onclick="nextStep('step_manager')">Team Up & Call Manager</button><button class="btn btn-danger" onclick="nextStep('maze_descope')">I don't care. Descope it.</button></div>
-    </div>
-
-    <div id="step_manager" class="card hidden">
-        <h2 style="color:var(--safe);">The Manager Gambit</h2>
-        <div class="rep-prompt">📢 REP: Put phone on Speaker. Fight for the Client.</div>
-        <div class="redirect-box"><span class="redirect-title">The Proposition</span><p style="margin:0;">"If I call my boss right now and fight for a <b>'Today Only' special price</b> to keep the specs exactly as they are... will you order it with me today?"</p></div>
-        <div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_discount_win')">Manager Approved (10%)</button><button class="btn btn-danger" onclick="nextStep('step_manager_loud')">Manager Said No (Descope)</button></div>
-    </div>
-
-    <div id="step_manager_loud" class="card hidden">
-        <h2 style="color:var(--danger);">Engage Support</h2>
-        <div class="redirect-box" style="background:#fff5f5; border-color:var(--danger);">
-            <div class="rep-prompt urgent" style="margin-bottom:10px;">⚠️ ASK LOUDLY (For Manager to hear)</div>
-            <p style="font-size:1.2rem; font-weight:bold; color:#333;">"Well, did you perhaps have a budget in mind?"</p>
-        </div>
-        <div class="btn-grid">
-            <button class="btn btn-safe" onclick="nextStep('step_discount_win')">They gave a number (Deal)</button>
-            <button class="btn btn-danger" onclick="nextStep('maze_descope')">Still Stalled (Descope)</button>
+    <div id="view_price" class="hidden">
+        <div class="card">
+            <h2>2. Investment Overview</h2>
+            <div style="background:#f0f9ff; border:2px solid var(--p); border-radius:12px; padding:30px; text-align:center; margin:20px 0;">
+                <div style="text-transform:uppercase; font-weight:800; color:var(--p); font-size:0.8rem;">Total Project Investment</div>
+                <div style="font-size:2rem; font-weight:800; color:#333;">[ STATE PRICE ]</div>
+            </div>
+            <button class="btn btn-safe" onclick="goTo('view_win')">Happy / Let's Go</button>
+            <button class="btn btn-danger" onclick="goTo('view_hub')">Discuss...</button>
         </div>
     </div>
 
-    <div id="maze_descope" class="card hidden">
-        <h2 style="color:var(--danger);">Reduce Quality</h2>
-        <p>To go lower, we MUST remove features.</p>
-        <div id="descopeList">
-            <div class="checklist-item active" onclick="toggleStrike(this)"><div class="check-circle"></div><div><b>1. Step Down Fabric Group</b></div></div>
-            <div class="checklist-item active" onclick="toggleStrike(this)"><div class="check-circle"></div><div><b>2. Change Motors to Manual</b></div></div>
-            <div class="checklist-item active" onclick="toggleStrike(this)"><div class="check-circle"></div><div><b>3. Remove Specific Windows</b></div></div>
+    <div id="view_hub" class="hidden">
+        <div class="card">
+            <h2>3. Project Refinement</h2>
+            <button class="btn btn-outline" onclick="goTo('branch_price')">💰 Price / Value</button>
+            <button class="btn btn-outline" onclick="goTo('branch_partner')">👫 Partner / Spouse</button>
+            <button class="btn btn-outline" onclick="goTo('branch_tech')">🛡️ Warranty / Tech</button>
+            <button class="btn btn-outline" onclick="goTo('branch_time')">⏳ Timing / Dates</button>
+            <button class="btn btn-outline" onclick="goTo('branch_comp')">🔍 Comparing Quotes</button>
         </div>
-        <div class="btn-grid"><button class="btn btn-danger" onclick="doDescope()">Reduce Quality</button><button class="btn btn-primary" onclick="nextStep('step_manager_gambit')">"Make it Cheaper?" (Call)</button></div>
-        <span class="exit-link" onclick="nextStep('step_exit')">The budget is strictly fixed. (Archive Quote)</span>
     </div>
 
-    <div id="maze_partner" class="card hidden"><h2 style="color:var(--warn);">Joint Decision</h2><div class="redirect-box"><p><b>Question:</b> "If they were here and said YES, would you sign right now?"</p></div><div class="btn-grid"><button class="btn btn-primary" onclick="nextStep('step_win')">Call & Sign</button><button class="btn btn-outline" onclick="nextStep('step_crossroads')">It's not the Partner</button></div><span class="exit-link" onclick="nextStep('step_exit')">Absolute Veto.</span></div>
-    <div id="maze_shop" class="card hidden"><h2 style="color:var(--p);">Product Match</h2><div class="redirect-box"><p>Check these 3 things:</p><ul><li>Reinforced Core?</li><li>Acmeda Hardware?</li><li>10 Year Warranty?</li></ul></div><div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Stick with Quality</button><button class="btn btn-outline" onclick="nextStep('step_crossroads')">Review Budget Instead</button></div><span class="exit-link" onclick="nextStep('step_exit')">Don't have what I want.</span></div>
-    <div id="maze_time" class="card hidden"><h2 style="color:var(--warn);">Schedule Risk</h2><div class="redirect-box"><span class="redirect-title">Production Reality</span><p>Lead Time: <b>8 Weeks</b>. Order today = Install [Date]. Delay = Risk.</p></div><div class="btn-grid"><button class="btn btn-safe" onclick="nextStep('step_win')">Secure Slot</button><button class="btn btn-outline" onclick="nextStep('step_exit')">Risk Delay</button></div></div>
+    <div id="branch_price" class="hidden">
+        <div class="back-btn" onclick="goTo('view_hub')">Back to Options</div>
+        <div class="card">
+            <h2>Price Calibration</h2>
+            <div class="list-item active" onclick="this.classList.toggle('struck')"><div class="list-header"><span>Switch to 'Plan B'</span><div class="check-circle"></div></div></div>
+            <div class="list-item active" onclick="this.classList.toggle('struck')"><div class="list-header"><span>Step Down Fabric</span><div class="check-circle"></div></div></div>
+            <div class="list-item active" onclick="this.classList.toggle('struck')"><div class="list-header"><span>Remove Motors</span><div class="check-circle"></div></div></div>
+            
+            <button class="btn btn-danger" onclick="goTo('sub_manager')">"Can we do better?" (Call Manager)</button>
+            <p style="text-align:center; margin-top:15px; text-decoration:underline; cursor:pointer;" onclick="resetJob()">Budget Fixed. Archive Quote.</p>
+        </div>
+    </div>
 
-    <div id="step_win" class="card hidden" style="text-align:center; border-left-color:var(--safe);"><h1 style="font-size:4rem;">🎉</h1><h2>Green Light</h2><button class="btn btn-outline" onclick="openReset()">Start New Project</button></div>
-    <div id="step_discount_win" class="card hidden" style="text-align:center; border-left-color:var(--safe);"><h1 style="font-size:4rem;">🤝</h1><h2>Manager Approved</h2><p>10% Discount Applied.</p><button class="btn btn-outline" onclick="openReset()">Start New Project</button></div>
-    <div id="step_exit" class="card hidden" style="text-align:center; border-left-color: #95a5a6;"><h1 style="font-size:4rem; filter:grayscale(1);">📂</h1><h2>Project Archived</h2><button class="btn btn-outline" onclick="openReset()">Close Session</button></div>
+    <div id="sub_manager" class="hidden">
+        <div class="card">
+            <h2>The 'Today Only' Call</h2>
+            <div class="info-panel">
+                <h4>Strategy:</h4>
+                <p>"If I call my boss right now and fight for a special price to <b>keep the specs exactly as they are</b>... will you order it with me today?"</p>
+            </div>
+            <button class="btn btn-safe" onclick="goTo('view_win')">Manager Approved (10%)</button>
+            <button class="btn btn-danger" onclick="document.getElementById('loud').classList.remove('hidden')">Hesitating...</button>
+            <div id="loud" class="info-panel hidden" style="background:#fff5f5; border-left-color:var(--danger); margin-top:10px;">
+                <h4 style="color:var(--danger);">⚠️ ASK LOUDLY:</h4>
+                <p>"Well, did you perhaps have a specific budget figure in mind?"</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="branch_tech" class="hidden">
+        <div class="back-btn" onclick="goTo('view_hub')">Back to Options</div>
+        <div class="card">
+            <h2>Peace of Mind</h2>
+            <button class="btn btn-outline" onclick="alert('10 Years Structure, 5-10 Fabric, 7 Motors.')">Warranty Terms</button>
+            <button class="btn btn-outline" onclick="alert('Charge every 6-9 months. 10,000 cycles.')">Motor Life</button>
+            <button class="btn btn-safe" onclick="goTo('view_win')">Satisfied? Let's Sign.</button>
+        </div>
+    </div>
+
+    <div id="view_win" class="hidden">
+        <div class="card" style="text-align:center; border-left-color:var(--safe);">
+            <h1 style="font-size:4rem;">🎉</h1>
+            <h2>Green Light</h2>
+            <p>Proceeding to paperwork.</p>
+            <button class="btn btn-outline" onclick="resetJob()">Start New Project</button>
+        </div>
+    </div>
 </div>
 
 <div id="specs" class="content">
-    
-    <div class="card" style="background:#f9f9f9; border-left-color:#333;">
-        <h3>Shutter Ballpark Calculator</h3>
-        <div class="calc-row"><span class="calc-label">Width (mm)</span><input type="number" id="sW" class="calc-inp"></div>
-        <div class="calc-row"><span class="calc-label">Height (mm)</span><input type="number" id="sH" class="calc-inp"></div>
-        <div class="calc-row"><span class="calc-label">Rate ($/sqm)</span><input type="number" id="sR" class="calc-inp" value="400"></div>
-        <button class="btn btn-primary" onclick="runShutterCalc()" style="width:100%; margin-top:10px; animation:none;">Estimate Cost</button>
-        <div id="sRes" class="calc-res" style="background:#333;">$0.00 (0 sqm)</div>
+    <div class="card" style="background:#f0f0f0; border-left-color:#333;">
+        <h3>Shutter Estimator ($400/sqm)</h3>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="sW" class="std-input" placeholder="W (mm)">
+            <input type="number" id="sH" class="std-input" placeholder="H (mm)">
+        </div>
+        <button class="btn btn-primary" onclick="calcShutter()">Estimate</button>
+        <div id="shutterRes" style="text-align:center; font-weight:bold; margin-top:10px;">$0.00</div>
     </div>
-
-    <input type="text" id="tSearch" class="search-input" placeholder="Search (e.g. 'remote', 'gap')..." onkeyup="filterTech()">
-    <div id="bread" class="breadcrumb hidden"><span onclick="renderCategories()">Categories</span> > <span id="breadCat"></span></div>
-    <div id="catGrid" class="cat-grid"></div>
-    <div id="prodList" class="hidden"></div>
-    <div id="detailView" class="hidden"></div>
+    <input type="text" class="std-input" placeholder="Search Specs..." style="text-align:left; margin-bottom:15px;" onkeyup="alert('Search Simulated: Connect Database')">
 </div>
 
 <script>
-    /* --- DATA --- */
-    const techData = {
-        "Roller Blinds": [
-            {name:"Hardware (Acmeda)", keys:"chain tube rb09", desc:"Standard RB09 Hardware", details:"Chain: RB09 Smooth.\nTube: 45mm HD.\nLight Gaps: 14mm/10mm."},
-            {name:"Recess Depths", keys:"fit reveal depth", desc:"Minimum depths", details:"Single: 60mm.\nDouble: 135mm."}
-        ],
-        "Plantation Shutters": [
-            {name:"Lumiere Core", keys:"aluminium reinforced", desc:"Hybrid Core", details:"Aluminium reinforced stiles. 20 Year Warranty."},
-            {name:"Framing", keys:"z-frame l-frame", desc:"Frame Options", details:"Z-Frame: Out of square.\nL-Frame: Inside mount."}
-        ],
-        "Curtains": [
-            {name:"Stacking", keys:"s-fold pinch", desc:"Stack widths", details:"S-Fold: ~30%.\nPinch: ~25%."}
-        ],
-        "Outdoor": [
-            {name:"Zipscreen", keys:"wind track", desc:"Wind rated blind", details:"Headbox: 110mm.\nWind: 60km/h rating."}
-        ]
+    /* --- GENIUS CHATBOT LOGIC --- */
+    const knowledgeBase = {
+        "clean": "For Rollers: Damp cloth only. For Sheers: Gentle hand wash or vacuum brush. Shutters: Feather duster, never soak.",
+        "motor": "Automate Li-Ion motors need charging every 6-9 months. The magnetic charger snaps on easily.",
+        "battery": "Automate Li-Ion motors need charging every 6-9 months. The magnetic charger snaps on easily.",
+        "gap": "Roller blinds have light gaps: 14mm on chain side, 10mm on idle side. Use a fascia or channels to block it.",
+        "halo": "Roller blinds have light gaps: 14mm on chain side, 10mm on idle side. Use a fascia or channels to block it.",
+        "heat": "Best for heat: Honeycomb (Cellular) blinds trap air. Second best: Cassette Rollers with Blockout fabric.",
+        "warranty": "Structure: 10 Years. Fabric: 5-10 Years (Supplier dependent). Motors: 7 Years. Peace of mind.",
+        "uniline": "Uniline fabric comes with a solid 10-year warranty.",
+        "zipscreen": "Zipscreen max width ~5.8m. Wind rated to 60km/h but should be retracted in storms.",
+        "help": "Sales Tip: Try 'If I could get it to that price, would you be happy to sign right now?'"
     };
 
-    /* --- TECH LOGIC --- */
-    function renderCategories() {
-        const grid = document.getElementById('catGrid'); grid.innerHTML = "";
-        document.getElementById('bread').classList.add('hidden'); document.getElementById('prodList').classList.add('hidden'); document.getElementById('detailView').classList.add('hidden'); document.getElementById('catGrid').classList.remove('hidden');
-        Object.keys(techData).forEach(cat => { grid.innerHTML += `<div class="cat-card" onclick="renderProducts('${cat}')">${cat}</div>`; });
+    function toggleChat() {
+        const win = document.getElementById('chatWindow');
+        win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+        document.getElementById('chatIn').focus();
     }
-    function renderProducts(cat) {
-        const list = document.getElementById('prodList'); list.innerHTML = "";
-        document.getElementById('catGrid').classList.add('hidden'); document.getElementById('detailView').classList.add('hidden');
-        list.classList.remove('hidden'); document.getElementById('bread').classList.remove('hidden'); document.getElementById('breadCat').innerText = cat;
-        techData[cat].forEach((prod, index) => { list.innerHTML += `<div class="tech-list-item" onclick="renderDetail('${cat}', ${index})"><span>${prod.name}</span> <span>></span></div>`; });
-    }
-    function renderDetail(cat, index) {
-        const prod = techData[cat][index];
-        const view = document.getElementById('detailView'); document.getElementById('prodList').classList.add('hidden'); view.classList.remove('hidden');
-        view.innerHTML = `<div class="spec-detail"><h3>${prod.name}</h3><p>${prod.desc}</p><hr style="border:0; border-top:1px solid #eee; margin:10px 0;"><div style="white-space: pre-line;">${prod.details}</div></div><button class="btn-outline" style="width:100%; margin-top:15px; padding:10px; border-radius:8px;" onclick="renderProducts('${cat}')">Back</button>`;
-    }
-    function filterTech() {
-        const term = document.getElementById('tSearch').value.toLowerCase();
-        if(!term) { renderCategories(); return; }
-        const list = document.getElementById('prodList');
-        document.getElementById('catGrid').classList.add('hidden'); document.getElementById('detailView').classList.add('hidden'); document.getElementById('bread').classList.add('hidden');
-        list.classList.remove('hidden'); list.innerHTML = "";
-        Object.keys(techData).forEach(cat => {
-            techData[cat].forEach((prod, index) => {
-                if((prod.name+" "+prod.keys+" "+prod.desc).toLowerCase().includes(term)) {
-                    list.innerHTML += `<div class="tech-list-item" onclick="renderDetail('${cat}', ${index})"><span>${prod.name} <span style="font-size:0.7rem; color:#999;">(${cat})</span></span> <span>></span></div>`;
+
+    function handleEnter(e) { if(e.key === 'Enter') sendMsg(); }
+
+    function sendMsg() {
+        const input = document.getElementById('chatIn');
+        const text = input.value.trim().toLowerCase();
+        if(!text) return;
+
+        addBubble(input.value, 'user');
+        input.value = '';
+
+        // Simulate thinking
+        setTimeout(() => {
+            let response = "I'm not sure about that specific detail. Check the Tech Specs tab!";
+            // Simple keyword matching
+            for (const key in knowledgeBase) {
+                if (text.includes(key)) {
+                    response = knowledgeBase[key];
+                    break;
                 }
-            });
-        });
+            }
+            addBubble(response, 'bot');
+        }, 600);
     }
 
-    /* --- CALCULATORS --- */
-    function runCalc() {
-        const h = document.getElementById('hInput').value;
-        const w = document.getElementById('wInput').value;
-        const hMm = h ? Math.round(h * 89) : 0;
-        const wMm = w ? Math.round(w * 240) : 0;
-        document.getElementById('cResult').innerText = `H: ${hMm}mm | W: ${wMm}mm`;
-    }
-    function resetCalc() {
-        document.getElementById('hInput').value = ''; document.getElementById('wInput').value = '';
-        document.getElementById('cResult').innerText = '0 mm x 0 mm';
-    }
-    function runShutterCalc() {
-        const w = document.getElementById('sW').value;
-        const h = document.getElementById('sH').value;
-        const r = document.getElementById('sR').value;
-        if(w && h && r) {
-            const sqm = (w/1000) * (h/1000);
-            const total = sqm * r;
-            document.getElementById('sRes').innerText = `$${total.toFixed(2)} (${sqm.toFixed(2)} sqm)`;
-        }
+    function addBubble(text, type) {
+        const body = document.getElementById('chatBody');
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        div.innerText = text;
+        body.appendChild(div);
+        body.scrollTop = body.scrollHeight;
     }
 
-    /* --- SCORING & LOGIC --- */
-    let scoreObj = {intent1:0, intent2:0, intent3:0, intent4:0, intent5:0}, currentScore=0;
-    let expertObj = {exp1:0, exp2:0, exp3:0}, expertScore=0;
-
-    function toggleExpert(id) { const el = document.getElementById(id); el.classList.toggle('active'); expertObj[id] = el.classList.contains('active') ? 1 : 0; document.getElementById('expertScore').innerText = Object.values(expertObj).reduce((a,b)=>a+b,0) + "/3"; }
-    function toggleIntent(id) { const el = document.getElementById(id); el.classList.toggle('active'); scoreObj[id] = el.classList.contains('active') ? 1 : 0; updateScore(); }
-    function setPartner(isYes) { document.getElementById('pYes').classList.toggle('selected', isYes); document.getElementById('pNo').classList.toggle('selected', !isYes); scoreObj.intent4 = isYes ? 1 : 0; document.getElementById('pWarn').style.display = isYes ? 'none' : 'block'; updateScore(); }
-    function updateScore() {
-        currentScore = Object.values(scoreObj).reduce((a,b)=>a+b,0);
-        document.getElementById('scoreDisplay').innerText = currentScore + "/5";
-        const pitchNav = document.getElementById('nav-pitch');
-        if(currentScore >= 3) { pitchNav.innerHTML = "Shared Table 🔓"; pitchNav.classList.add('unlocked'); document.getElementById('unlockMsg').style.display = 'block'; }
-        else { pitchNav.innerHTML = "Shared Table 🔒"; pitchNav.classList.remove('unlocked'); document.getElementById('unlockMsg').style.display = 'none'; }
-    }
-
-    /* --- NAVIGATION & RESET --- */
+    /* --- APP LOGIC --- */
     function switchTab(id) {
-        if(id === 'pitch' && currentScore < 3) { alert("Build Value! Score 3/5 required."); return; }
-        document.querySelectorAll('.content').forEach(el => el.classList.remove('active')); document.getElementById(id).classList.add('active');
-        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active')); document.getElementById('nav-'+id).classList.add('active');
-        if(id === 'pitch') document.getElementById('nav-pocket').classList.add('vanished');
-        if(id === 'specs' && document.getElementById('catGrid').innerHTML === "") renderCategories();
+        document.querySelectorAll('.content').forEach(e => e.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-pill').forEach(e => e.classList.remove('active'));
+        document.getElementById('nav-'+id).classList.add('active');
     }
-    function openReset() { document.getElementById('resetModal').style.display = 'flex'; }
-    function closeReset() { document.getElementById('resetModal').style.display = 'none'; }
-    function resetPage() {
-        document.querySelectorAll('input').forEach(el => el.value = ''); 
-        document.getElementById('cResult').innerText = '0 mm'; document.getElementById('sRes').innerText = '$0.00';
-        if(document.getElementById('pitch').classList.contains('active')) {
-             document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden')); document.getElementById('step_value').classList.remove('hidden');
-             checkCount = 0; document.querySelectorAll('#pitch .checklist-item').forEach(el => el.classList.remove('active')); document.getElementById('revealBtn').classList.add('hidden');
+
+    function toggleScore(el, type) {
+        el.classList.toggle('active');
+        const count = el.parentElement.querySelectorAll('.active').length;
+        if(type==='expert') document.getElementById('expertScore').innerText = count+"/3";
+        else {
+            document.getElementById('intentScore').innerText = count+"/5";
+            if(count>=3) document.getElementById('unlockMsg').style.display='block';
         }
-        closeReset();
-    }
-    function resetJob() { if(confirm("Back to Staff Only?")) location.reload(); }
-
-    /* --- PITCH FLOW --- */
-    let checkCount = 0;
-    function toggleCheck(el) { el.classList.toggle('active'); checkCount += el.classList.contains('active') ? 1 : -1; document.getElementById('revealBtn').classList.toggle('hidden', checkCount < 3); }
-    function toggleStrike(el) { if(el.classList.contains('active')) { el.classList.remove('active'); el.classList.add('struck'); } else { el.classList.add('active'); el.classList.remove('struck'); } }
-    function playDrumroll() { document.getElementById('drumrollOverlay').style.display = 'flex'; setTimeout(() => { document.getElementById('drumrollOverlay').style.display = 'none'; nextStep('step_reveal'); }, 2000); }
-    function nextStep(id) { document.querySelectorAll('#pitch .card').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); }
-    function showLoudQuestion() { document.getElementById('loudQuestion').classList.remove('hidden'); }
-    function doDescope() {
-        const items = document.querySelectorAll('#descopeList .checklist-item');
-        items.forEach(el => { el.classList.remove('active'); el.classList.add('struck'); });
     }
 
-    renderCategories();
+    function selectChip(el, type, val) {
+        el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        // Simple logic for demo
+        const box = document.getElementById('recBox');
+        const title = document.getElementById('recTitle');
+        const desc = document.getElementById('recDesc');
+        const alt = document.getElementById('recAlt');
+        
+        // Wait for both selections in real app, here we just show box
+        box.style.display = 'block';
+        if(val === 'sleep') { title.innerText = "Blockout Rollers + Cassette"; desc.innerText = "Maximum darkness."; alt.innerText = "Std Rollers (Back Rolled)"; }
+        else if(val === 'style') { title.innerText = "Sheer S-Fold Curtains"; desc.innerText = "Soft elegance."; alt.innerText = "Double Rollers"; }
+        else { title.innerText = "Double Rollers"; desc.innerText = "Day/Night Control."; alt.innerText = "Single Blockout"; }
+    }
+
+    function runCalc() {
+        const h = document.getElementById('calcH').value;
+        const w = document.getElementById('calcW').value;
+        document.getElementById('calcRes').innerText = (h?Math.round(h*89):0)+"mm x "+(w?Math.round(w*240):0)+"mm";
+    }
+
+    function checkReveal() {
+        const c = document.getElementById('view_verify').querySelectorAll('.active').length;
+        if(c>=3) document.getElementById('revealBtn').classList.remove('hidden');
+        else document.getElementById('revealBtn').classList.add('hidden');
+    }
+
+    function goTo(id) {
+        document.querySelectorAll('#pitch > div').forEach(d => d.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function calcShutter() {
+        const w = document.getElementById('sW').value/1000;
+        const h = document.getElementById('sH').value/1000;
+        document.getElementById('shutterRes').innerText = "$"+(w*h*400).toFixed(2);
+    }
+
+    function openReset() { document.getElementById('resetModal').style.display='flex'; }
+    function closeReset() { document.getElementById('resetModal').style.display='none'; }
+    function resetPage() { document.querySelectorAll('input').forEach(i=>i.value=''); closeReset(); }
+    function resetJob() { location.reload(); }
 </script>
 </body>
 </html>
+
